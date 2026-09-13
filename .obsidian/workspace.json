@@ -11,14 +11,10 @@
             "id": "8e207f3b57c822f8",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Welcome.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "Welcome"
+              "title": "New tab"
             }
           }
         ]
@@ -115,7 +111,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Welcome.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -134,7 +129,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Welcome.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -177,7 +171,6 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Welcome.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -206,6 +199,43 @@
   },
   "active": "8e207f3b57c822f8",
   "lastOpenFiles": [
-    "Welcome.md"
+    "workflows/09-train-vla.md",
+    "workflows/09-train-vla.md.tmp.28195.c4e48e7018ff",
+    "workflows/08-train-act.md",
+    "workflows/08-train-act.md.tmp.28195.9623162f9257",
+    "workflows/07-inspect-replay.md",
+    "workflows/07-inspect-replay.md.tmp.28195.007c56f024f4",
+    "workflows/06-record.md",
+    "workflows/06-record.md.tmp.28195.d818a38c1a25",
+    "workflows/05-teleoperate.md",
+    "workflows/05-teleoperate.md.tmp.28195.093fc98050db",
+    "workflows/04-find-cameras.md",
+    "workflows/04-find-cameras.md.tmp.28195.08bbbab33466",
+    "workflows/03-calibrate.md",
+    "workflows/03-calibrate.md.tmp.28195.f65122eec13f",
+    "workflows/02-find-ports.md",
+    "workflows/02-find-ports.md.tmp.28195.df23edd49f82",
+    "workflows/01-environment.md",
+    "workflows/01-environment.md.tmp.28195.26914a680d28",
+    "machines/hf-cloud-gpu.md",
+    "machines/hf-cloud-gpu.md.tmp.28195.4f133771603d",
+    "machines/macbook-m3.md",
+    "machines/desktop-ubuntu.md",
+    "hardware/hardware-history.md",
+    "hardware/feetech-firmware.md",
+    "hardware/cameras.md",
+    "hardware/calibration.md",
+    "hardware/so100-arms.md",
+    "00-Start-Here.md",
+    "README.md",
+    "CLAUDE.md",
+    "Welcome.md",
+    "archive/reading-list.md",
+    "archive/vla-roadmap-2026-08.md",
+    "archive/SO100_FOOLS_MATE_GUIDE.md",
+    "archive/SO100_PICK_AND_PLACE_GUIDE.md",
+    "assets/captured_images/opencv__dev_video4.png",
+    "assets/captured_images/opencv__dev_video2.png",
+    "assets/captured_images/opencv__dev_video0.png"
   ]
 }
