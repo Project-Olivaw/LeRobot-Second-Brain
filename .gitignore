@@ -1,0 +1,24 @@
+# datasets, checkpoints, media — reference them by path in experiments/, never commit
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.mp4
+*.mkv
+*.avi
+*.parquet
+*.arrow
+outputs/
+datasets/
+checkpoints/
+wandb/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+# secrets
+.env.local
+*.token
+# obsidian workspace state
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
