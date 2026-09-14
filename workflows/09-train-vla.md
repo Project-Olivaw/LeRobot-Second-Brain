@@ -19,7 +19,7 @@ in lerobot 0.5.2 (defaults: `chunk_size=50`, `n_action_steps=50`, `optimizer_lr=
   task strings**, then merge (`lerobot-edit-dataset`) or pass a list to `--dataset.repo_id` if the
   installed version supports it — check `--help`.
 - 2 cameras (top + wrist) at 640x480 is fine; SmolVLA resizes internally. Camera keys still must match at eval.
-- Install extras: `uv sync --locked --extra feetech --extra smolvla` (desktop) / `pip install 'lerobot[smolvla]'`.
+- Install extras: `uv sync --locked --extra feetech --extra smolvla` (desktop, 0.5.2) — on 0.6.x also `--extra core_scripts --extra training` / `pip install 'lerobot[smolvla]'`.
 
 ## Fine-tune on the desktop (16 GB)
 
@@ -48,6 +48,10 @@ Notes:
 - For a real quality jump on a specialised task, unfreeze the vision encoder — more VRAM, slower:
   `--policy.freeze_vision_encoder=false --policy.train_expert_only=false` (batch 4 on 16 GB).
 - Train loss plateau → stop. 20k steps on 50 episodes is a reasonable first run; expect ~1-2 s/step on the 5060 Ti with the encoder frozen (measure `updt_s`).
+- **HF's own numbers** (`docs/source/smolvla.mdx`, 0.6.2): 20k steps ≈ **4 h on one A100** at batch 64 (~0.7 s/step);
+  their SO-100 pick-place dataset is **50 episodes = 5 object positions × 10 repeats**, and "25 episodes was
+  not enough, leading to bad performance". Budget accordingly: a same-evening SmolVLA is not realistic —
+  launch it on [[hf-cloud-gpu]] with `--save_checkpoint_to_hub=true` and evaluate the next day.
 
 ## Fine-tune on HF Jobs
 

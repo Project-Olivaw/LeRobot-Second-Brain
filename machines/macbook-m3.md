@@ -11,8 +11,10 @@ Everything below is what changes versus [[desktop-ubuntu]]; the workflows are ot
 
 1. Install LeRobot (Python 3.12, uv):
    ```bash
-   git clone https://github.com/huggingface/lerobot ~/GitHub/lerobot && cd ~/GitHub/lerobot
-   uv sync --locked --extra feetech        # add --extra smolvla when training/infering SmolVLA locally
+   cd ~/GitHub/AnotherOnes/lerobot            # already cloned here (same path as the desktop); lerobot 0.6.2-dev
+   uv sync --locked --extra core_scripts --extra feetech --extra smolvla --extra training
+   # 0.6.x: `datasets`, `pynput` and `rerun` moved to extras; without `core_scripts` every lerobot-* CLI
+   # dies with "'datasets' is required but not installed". 0.5.x only needed --extra feetech.
    uv run lerobot-find-port                # sanity: CLI works
    ```
    Pin the same release the dataset/policy was made with when possible (desktop = 0.5.2). A newer

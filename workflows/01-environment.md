@@ -17,7 +17,8 @@ below are written as `$RUN lerobot-…`, where `$RUN` is `uv run` (default) or e
 
 ```bash
 cd ~/GitHub/AnotherOnes/lerobot
-uv sync --locked --extra feetech            # already done; re-run after git pull
+uv sync --locked --extra feetech            # already done; re-run after git pull (0.5.2)
+# lerobot >= 0.6: add --extra core_scripts --extra training (datasets/pynput/rerun became extras) — see [[macbook-m3]]
 uv run lerobot-find-port --help             # proves the CLI resolves
 ```
 
@@ -25,7 +26,7 @@ Or `conda activate lerobot` and set `RUN=""` — see [[desktop-ubuntu]] for the 
 
 ## MacBook
 
-See the checklist in [[macbook-m3]] (clone, `uv sync --locked --extra feetech`, copy calibration, fill `machines/macbook.env`).
+See the checklist in [[macbook-m3]] (`uv sync --locked --extra core_scripts --extra feetech --extra smolvla --extra training`, copy calibration, fill `machines/macbook.env`).
 
 ## Hugging Face login (only needed to push/pull from the Hub)
 
