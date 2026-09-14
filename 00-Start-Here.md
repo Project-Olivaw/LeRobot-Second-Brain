@@ -7,8 +7,9 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - Two ACT policies were trained on the desktop: [[2026-06-29-lego-skeleton-act]] (worked as a
   pipeline test, 13 episodes) and [[2026-07-13-fools-mate-act]] (50 episodes, 3 cameras, **failed at eval**).
 - Hardware: SO-100 leader + follower, 3 USB cameras. See [[so100-arms]], [[cameras]].
-- Next: [[2026-09-medicaments-vla]] — medicament box, **go on 2026-09-13**: 50 episodes (5 spots × 10)
-  recorded on the desktop, ACT → SmolVLA overnight on the 5060 Ti, demo from the MacBook via the Hub.
+- Now: [[2026-09-medicaments-vla]] — "Complejo B" box → ESP32 car, **recording 2026-09-13 night** on the
+  desktop (lerobot 0.6.2 via `uv run`), 50 episodes (5 spots × 10), ACT → SmolVLA overnight on the 5060 Ti,
+  demo from the MacBook via the Hub.
   Feeds the talk in [[vla-demo-plan]].
 - MacBook: venv ready (0.6.2-dev), calibration copied; ports/camera indices still `TODO` ([[macbook-m3]]).
 
@@ -65,11 +66,13 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[policy-does-not-survive-a-new-table]] — bring the scene, not a new model
 - [[policy-travels-as-a-folder]] — desktop → Mac: Hub or USB, same version, same keys
 - [[lerobot-06-extras]] — 0.6.x needs `--extra core_scripts`
+- [[conda-env-is-not-the-checkout]] — `git pull` does not touch the pip conda env; `uv sync` after every checkout
 
 ## Reference
 - [[troubleshooting]] — symptom table
 - [[timeline]] — chronological log
-- `tools/` — `env.sh`, `find.sh`, `teleop.sh`, `record.sh`, `train_act.sh`, `train_smolvla.sh`, `eval.sh`, `push_hub.sh`, `bench.py`
+- `tools/` — `env.sh`, `find.sh`, `teleop.sh`, `record.sh`, `train_act.sh`, `train_smolvla.sh`, `eval.sh`, `push_hub.sh`, `bench.py`, `eta.sh`;
+  project runners `record_medicament_box.sh`, `overnight_medicament_box.sh`
 - `archive/` — [[SO100_PICK_AND_PLACE_GUIDE]], [[SO100_FOOLS_MATE_GUIDE]], [[vla-roadmap-2026-08]], [[reading-list]]
 - [[vla-demo-plan]] — presentation
 

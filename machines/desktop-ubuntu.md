@@ -19,8 +19,9 @@ why this vault exists.
 
 | Env | Version | How to run | Notes |
 |---|---|---|---|
-| `~/GitHub/AnotherOnes/lerobot/.venv` (uv) | **0.5.2** (commit 3dd19d04) | `cd ~/GitHub/AnotherOnes/lerobot && uv run lerobot-…` | **Preferred.** Matches the guides and the old checkpoints. For [[2026-09-medicaments-vla]] move this checkout to the Mac's commit `8c894413c` (0.6.2-dev) so checkpoints load on both — command in the experiment note; 0.6.x needs `--extra core_scripts` ([[lerobot-06-extras]]). |
-| conda `lerobot` | 0.5.1 / torch 2.10 | `conda activate lerobot && lerobot-…` | What the user typed during the July sessions. Works; slightly older. |
+| `~/GitHub/AnotherOnes/lerobot/.venv` (uv) | **0.6.2** (commit `8c894413c`, synced 2026-09-13 with `--extra core_scripts --extra feetech --extra smolvla --extra training`) | `cd ~/GitHub/AnotherOnes/lerobot && uv run lerobot-…` | **Preferred; same commit as the MacBook.** Editable install: follows the checkout, so re-run `uv sync --locked …` after every `git pull`/checkout. Hardware + 2 cameras verified on this version. The old ACT checkpoints were trained on 0.5.2 (`git checkout v0.5.2 && uv sync` to reload them). |
+| conda `lerobot` (**miniforge3**, the one zsh activates) | 0.5.1 / torch 2.10 cu128 | `conda activate lerobot && lerobot-…` | Plain `pip install lerobot` — **not** linked to the checkout, so `git pull` there changes nothing here ([[conda-env-is-not-the-checkout]]). Fine for teleop practice; do not record/train the 0.6 datasets with it (dataset format v3.0 vs v2.1). |
+| conda `lerobot` (**miniconda3**) | 0.4.3 / torch 2.7 cu126 | `~/miniconda3/envs/lerobot` | Editable install of `~/SO-arm/lerobot` (Dec 2025). Only reached via `~/miniconda3/bin/conda`. Ignore. |
 | `~/personalProjects/vlaLerobot/vendor/lerobot` | 0.6.2 | `.venv` in that project | VLA study project; newer API (`lerobot-rollout` etc.). |
 | `~/personalProjects/lerobot_arm_calibration/lerobot` | 0.5.2 | that project's `.venv` | May 2026 single-arm work, RL scripts. |
 | `~/SO-arm/lerobot` | 0.4.3 | — | Dec 2025 Isaac Lab sim2real repo `jayounghoyos/SO-100-arm-test`. Old. |
@@ -66,5 +67,5 @@ Exact hyperparameters: `assets/train_configs/*.train_config.json`.
 ## Resumen (ES)
 
 Escritorio Ubuntu con RTX 5060 Ti 16 GB. Usar `uv run` dentro de `~/GitHub/AnotherOnes/lerobot`
-(0.5.2). Follower en ttyACM1, leader en ttyACM0, cámaras 0/2/4. Aquí viven los datasets y
+(0.6.2, mismo commit que la Mac; el conda `lerobot` de miniforge es un pip 0.5.1 independiente del checkout). Follower en ttyACM1, leader en ttyACM0, cámaras 0/2/4. Aquí viven los datasets y
 checkpoints ACT (solo locales). Velocidad medida: ~0.08 s/paso con 1 cámara, ~0.25 s/paso con 3.

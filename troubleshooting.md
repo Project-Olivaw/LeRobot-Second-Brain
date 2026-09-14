@@ -13,6 +13,7 @@
 | `FileExistsError` on record/eval | dataset folder already exists | delete or unique name — [[file-exists-error-on-record]] |
 | `FileExistsError` on train | `output_dir` exists | new name / `--resume` — [[train-refuses-to-overwrite]] |
 | Task label looks like a dict | colon/apostrophe in `single_task` | [[single-task-no-colons]] |
+| "I pulled the repo, must I recreate conda?" / version differs from the checkout | conda env is a pip install; uv venv metadata stale | `uv sync --locked --extra …` after every checkout; `import lerobot; lerobot.__file__` to see which one runs — [[conda-env-is-not-the-checkout]] |
 | `HF_USER` empty | `hf auth whoami` format changed | [[hf-whoami-format]] |
 | Arrow keys ignored while recording | focus (Wayland/SSH) or macOS Accessibility permission | [[12-recording-keys]] |
 | Wall of rerun / Vulkan / EGL warnings | noise | read the Python traceback — [[rerun-warnings-are-harmless]] |
