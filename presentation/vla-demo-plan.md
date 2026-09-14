@@ -15,7 +15,12 @@ say "SO-ARM100 / SO-100" when pointing at the arm, or fix the wording in the dec
 
 ## Machine on stage: MacBook Pro M3 ([[macbook-m3]])
 
-Pre-flight (the day before, on Wi-Fi):
+How the policy gets here: trained on the desktop, pushed to the Hub, pulled on the Mac — the folder,
+the version rule and what else must travel are in [[policy-travels-as-a-folder]]. The scene kit is not
+optional: a new table breaks the policy ([[policy-does-not-survive-a-new-table]]).
+
+Pre-flight (**a week before** for the `mps` dry run; the rest the day before, on Wi-Fi):
+- [ ] Desktop and Mac on the same lerobot commit (experiment note records it).
 - [ ] `machines/macbook.env` filled and committed (ports, camera indices).
 - [ ] Calibration JSONs copied; `tools/teleop.sh` shows no offset.
 - [ ] Policy pulled: `uv run hf download ${HF_USER}/<policy>`; dataset for replay pulled.
@@ -47,6 +52,7 @@ $RUN lerobot-replay --robot.type=$ROBOT_TYPE --robot.port=$ROBOT_PORT --robot.id
 | Risk | Mitigation |
 |---|---|
 | Venue lighting differs from training | record 10 episodes at the venue in the morning and fine-tune? unrealistic — instead record the training set with 2-3 lighting levels, and bring the wrist light |
+| Venue table / background differs | bring the mat + tray + camera mounts as one kit — [[policy-does-not-survive-a-new-table]] |
 | USB / power glitch on stage | [[incorrect-status-packet]] checklist; spare cables; replay fallback |
 | `mps` inference too slow | run ACT baseline instead of SmolVLA, or lower fps; test beforehand |
 | Camera index shift on the Mac | probe at the venue; `.env` is a one-line fix |

@@ -19,7 +19,7 @@ why this vault exists.
 
 | Env | Version | How to run | Notes |
 |---|---|---|---|
-| `~/GitHub/AnotherOnes/lerobot/.venv` (uv) | **0.5.2** (commit 3dd19d04) | `cd ~/GitHub/AnotherOnes/lerobot && uv run lerobot-…` | **Preferred.** Matches the guides and the checkpoints. |
+| `~/GitHub/AnotherOnes/lerobot/.venv` (uv) | **0.5.2** (commit 3dd19d04) | `cd ~/GitHub/AnotherOnes/lerobot && uv run lerobot-…` | **Preferred.** Matches the guides and the old checkpoints. For [[2026-09-medicaments-vla]] move this checkout to the Mac's commit `8c894413c` (0.6.2-dev) so checkpoints load on both — command in the experiment note; 0.6.x needs `--extra core_scripts` ([[lerobot-06-extras]]). |
 | conda `lerobot` | 0.5.1 / torch 2.10 | `conda activate lerobot && lerobot-…` | What the user typed during the July sessions. Works; slightly older. |
 | `~/personalProjects/vlaLerobot/vendor/lerobot` | 0.6.2 | `.venv` in that project | VLA study project; newer API (`lerobot-rollout` etc.). |
 | `~/personalProjects/lerobot_arm_calibration/lerobot` | 0.5.2 | that project's `.venv` | May 2026 single-arm work, RL scripts. |

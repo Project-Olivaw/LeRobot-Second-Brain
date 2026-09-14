@@ -7,8 +7,10 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - Two ACT policies were trained on the desktop: [[2026-06-29-lego-skeleton-act]] (worked as a
   pipeline test, 13 episodes) and [[2026-07-13-fools-mate-act]] (50 episodes, 3 cameras, **failed at eval**).
 - Hardware: SO-100 leader + follower, 3 USB cameras. See [[so100-arms]], [[cameras]].
-- Next: [[2026-09-medicaments-vla]] — medicament boxes/bottles, SmolVLA, recorded on the MacBook,
-  trained on HF Jobs. Feeds the talk in [[vla-demo-plan]].
+- Next: [[2026-09-medicaments-vla]] — medicament box, **go on 2026-09-13**: 50 episodes (5 spots × 10)
+  recorded on the desktop, ACT → SmolVLA overnight on the 5060 Ti, demo from the MacBook via the Hub.
+  Feeds the talk in [[vla-demo-plan]].
+- MacBook: venv ready (0.6.2-dev), calibration copied; ports/camera indices still `TODO` ([[macbook-m3]]).
 
 ## Hardware
 - [[so100-arms]] — motors, ids, SO-100 vs SO-101
@@ -59,6 +61,10 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[updt-s-is-your-timer]]
 - [[rerun-warnings-are-harmless]]
 - [[good-dataset-rules]]
+- [[no-same-evening-vla]] — why 10 episodes + 2 hours cannot produce a VLA
+- [[policy-does-not-survive-a-new-table]] — bring the scene, not a new model
+- [[policy-travels-as-a-folder]] — desktop → Mac: Hub or USB, same version, same keys
+- [[lerobot-06-extras]] — 0.6.x needs `--extra core_scripts`
 
 ## Reference
 - [[troubleshooting]] — symptom table

@@ -4,7 +4,9 @@ Purpose: take the arms and cameras anywhere (the talk, another room), **record d
 them to the Hub**, run **inference** with a policy pulled from the Hub. Training happens on
 [[hf-cloud-gpu]] or the desktop, not here (no CUDA; `mps` works for ACT inference and light training only).
 
-Status: **not yet set up** — the `TODO` fields in `machines/macbook.env` must be filled on first use.
+Status (2026-09-13): **venv installed** at `~/GitHub/AnotherOnes/lerobot` (0.6.2-dev `8c894413c`, torch 2.11,
+`mps` available, `hf` CLI 1.30 inside the venv), **calibration copied**. Still `TODO`: ports and camera
+indices in `machines/macbook.env`, Accessibility permission, `uv run hf auth login`, first teleop.
 Everything below is what changes versus [[desktop-ubuntu]]; the workflows are otherwise identical.
 
 ## First-time setup checklist

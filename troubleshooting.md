@@ -24,6 +24,10 @@
 | Policy cannot build input / missing key | camera keys differ from training | [[camera-keys-are-baked-in]] |
 | Torch imports but crashes at first kernel (Blackwell) | wrong CUDA wheel | cu128 index; test with a real matmul — [[desktop-ubuntu]] |
 | Motor LEDs dark / blinking | cable / overload / wrong PSU voltage | [[so100-arms]] |
+| `ImportError: 'datasets' is required but not installed` on any `lerobot-*` (0.6.x) | extras split | `--extra core_scripts` — [[lerobot-06-extras]] |
+| Policy fails on a different table / at the venue | background out of distribution | bring the scene kit — [[policy-does-not-survive-a-new-table]] |
+| Checkpoint fails to load on the other machine (`config.json` field errors) | lerobot version mismatch | same commit on both — [[policy-travels-as-a-folder]] |
+| "Can we have a VLA tonight?" | data + compute floors | [[no-same-evening-vla]] |
 
 ## Resumen (ES)
 
