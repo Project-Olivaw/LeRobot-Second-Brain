@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Overnight chain on the desktop GPU: ACT baseline (short) -> SmolVLA fine-tune (long).
 # Usage: tools/overnight_medicament_box.sh [smolvla_steps=30000] [act_steps=20000]
+# Measured 2026-09-14 on the 5060 Ti, 2 cams 640x480, batch 8: ACT 0.19 s/step, SmolVLA (frozen encoder) 0.20 s/step.
 #   Detached:  nohup tools/overnight_medicament_box.sh > /dev/null 2>&1 &     (or run it inside tmux)
 #   Follow:    tail -f $LEROBOT_DIR/outputs/train/logs/smolvla_so100_medicament_box_*.log
 #   ETA:       tools/eta.sh <that log> 30000
@@ -56,11 +57,15 @@ if [ "${SKIP_ACT:-0}" != 1 ]; then
 fi
 
 # --- 2) SmolVLA fine-tune from lerobot/smolvla_base (encoder frozen, expert only — fits 16 GB at batch 8) ---
+# smolvla_base was pretrained with cameras named camera1/2/3; lerobot >= 0.6 refuses other names unless
+# mapped (lessons/smolvla-rename-map.md). The SAME map must be passed to lerobot-rollout at eval time.
+RENAME_MAP=${RENAME_MAP:-'{"observation.images.top": "observation.images.camera1", "observation.images.wrist": "observation.images.camera2"}'}
 VLA_LOG="$LOGDIR/${VLA_JOB}_${STAMP}.log"
-note "SmolVLA steps=$VLA_STEPS log=$VLA_LOG"
+note "SmolVLA steps=$VLA_STEPS log=$VLA_LOG rename_map=$RENAME_MAP"
 if run "$RUN lerobot-train \
   --policy.path=lerobot/smolvla_base \
   --dataset.repo_id=${DATASET_PREFIX}/${NAME} \
+  --rename_map=$(q "$RENAME_MAP") \
   --output_dir=outputs/train/${VLA_JOB} --job_name=${VLA_JOB} \
   --policy.device=$DEVICE \
   --batch_size=$BATCH_SIZE --num_workers=$NUM_WORKERS \

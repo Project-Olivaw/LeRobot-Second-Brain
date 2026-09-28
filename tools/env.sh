@@ -9,6 +9,8 @@ if [ ! -f "$_env" ]; then echo "no profile: $_env" >&2; return 1 2>/dev/null || 
 export VAULT_DIR="$(readlink -f "$_here/..")"
 # shellcheck disable=SC1090
 source "$_env"
+# Linux: resolve cameras by stable id -> index (tools/cameras.sh). macOS profiles keep static blocks.
+[ -d /dev/v4l/by-id ] && [ -n "${CAM_TOP_ID:-}" ] && source "$_here/cameras.sh"
 if [ -d "$LEROBOT_DIR" ]; then cd "$LEROBOT_DIR" || true; else echo "warning: LEROBOT_DIR=$LEROBOT_DIR not found" >&2; fi
 case "$ROBOT_PORT" in *TODO*) echo "warning: fill ports/cameras in machines/$_name.env" >&2;; esac
 echo "[$MACHINE] robot=$ROBOT_PORT teleop=$TELEOP_PORT device=$DEVICE run='$RUN' lerobot=$LEROBOT_DIR"
