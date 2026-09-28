@@ -1,6 +1,6 @@
 # 2026-09 — Medicament boxes / bottles — SmolVLA (recording)
 
-**Status:** **trained, never evaluated** — 50 episodes recorded, ACT and SmolVLA both finished 2026-09-14. No rollout has been run on the arm yet; the Evaluation table below is still empty. Nothing is on the Hub.
+**Status:** **WORKS — 80-90% success with SmolVLA** (2026-09, several evaluation sessions). Dataset and both policies are on the Hub. Next: the second instruction (magnesium bottle) so the talk's two-sentence demo exists — [[14-two-instruction-demo]].
 **Machine:** record on **desktop** (already set up), train on **desktop** overnight (HF Jobs as backup), demo on **macbook**
 **lerobot version:** **0.6.2 @ `8c894413c`** on both machines (desktop `uv run`, verified 2026-09-13 22:15; Mac venv) — see "Version alignment" below
 
@@ -137,18 +137,32 @@ Measured inference cost (`tools/bench_policy.py`, 5060 Ti): SmolVLA recomputes a
 **152 ms** every 1.7 s (ACT: 10 ms per 100-step chunk). See [[policy-inference-is-bursty]] — the Mac
 must be measured separately before the talk.
 
-## Evaluation — NOT DONE
+## Evaluation — done, and it works
 
-Nothing has been run on the arm. Next session, with the scene set up as it was on 2026-09-13:
+Several sessions on the real arm. **The first attempts failed** and looked like a dataset problem
+("too little or bad data"). It was not — after **changing the order of the cameras**, SmolVLA picked
+the red Complejo B box and placed it on the ESP32 car in **80-90% of attempts**.
 
-```bash
-source tools/env.sh desktop
-tools/eval.sh so100_medicament_box \
-  outputs/train/smolvla_so100_medicament_box/checkpoints/last/pretrained_model 10
-# quick look without recording: ... 0   (strategy base, 30 s)
-```
+That is the headline lesson of this experiment: a camera-order mismatch is invisible (no error, no
+warning) and produces exactly the hesitant, almost-right behaviour that reads as "needs more data".
+Written up in [[camera-order-matters]]; the structural fix — resolving cameras by `/dev/v4l/by-id`
+instead of bare indices — is in `machines/desktop.env` + `tools/cameras.sh`.
 
-Then fill: successes /10 per checkpoint, ACT vs SmolVLA, and whether it generalises to unseen spots.
+So: 50 episodes were enough, the pipeline is sound, and the failure mode to check first is wiring,
+not the model.
+
+Not recorded yet (worth doing if you evaluate again): success counts per checkpoint, ACT vs SmolVLA
+side by side, and behaviour at unseen spawn positions.
+
+## On the Hub (pushed 2026-09-27, private)
+
+| Repo | Size |
+|---|---|
+| `Youngermaster/so100_medicament_box` (dataset) | 1.2 GB |
+| `Youngermaster/smolvla_so100_medicament_box` | 869 MB |
+| `Youngermaster/act_so100_medicament_box` | 198 MB |
+
+Pull them anywhere with `tools/pull.sh dataset|policy <name>` ([[13-cross-machine-loop]]).
 
 ## Next for the talk
 

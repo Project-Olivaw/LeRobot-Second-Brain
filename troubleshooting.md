@@ -32,6 +32,10 @@
 | SmolVLA training dies in ~90 s with a camera-name error | `smolvla_base` expects `camera1/2/3` | pass `--rename_map` — [[smolvla-camera-slots]] |
 | Arm pauses rhythmically during a rollout | chunk recompute is slower than the control period | `--inference.type=rtc`; measure with `tools/bench_policy.py` — [[policy-inference-is-bursty]] |
 | Policy works at home, fails at the venue | light/background changed; auto-exposure shifted | bring the scene kit, lock the cameras — [[scene-kit]], [[lock-exposure-and-white-balance]] |
+| macOS probe finds only the FaceTime camera and/or a black frame | terminal lacks camera permission; Continuity Camera holds an index; unpowered hub | `tools/mac_cameras.sh` — [[macbook-m3]] |
+| `lerobot-find-port` only gives one arm | it detects one bus per run, by design | run it twice — `tools/find_ports.sh` |
+| Policy hesitates / reaches slightly wrong, "needs more data" | camera order swapped since training | [[camera-order-matters]] |
+| `403 ... rights to create a dataset under the namespace "local"` | `push_to_hub()` uses the dataset's own repo_id | re-point it first — `tools/push_dataset.py` / [[11-hub-sync]] |
 | Multi-task policy ignores the instruction | instructions imbalanced or too similar, or the scene gives the answer away | [[balance-the-instructions]] |
 
 ## Resumen (ES)

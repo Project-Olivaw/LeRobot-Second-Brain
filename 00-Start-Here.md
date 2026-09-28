@@ -7,10 +7,11 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - Two ACT policies were trained on the desktop: [[2026-06-29-lego-skeleton-act]] (worked as a
   pipeline test, 13 episodes) and [[2026-07-13-fools-mate-act]] (50 episodes, 3 cameras, **failed at eval**).
 - Hardware: SO-100 leader + follower, 3 USB cameras. See [[so100-arms]], [[cameras]].
-- [[2026-09-medicaments-vla]] — "Complejo B" box → ESP32 car. 50 episodes recorded; **ACT (20k, 1 h) and
-  SmolVLA (30k, 1 h 41, loss 0.032) both trained 2026-09-14 — but never evaluated on the arm, and nothing
-  is on the Hub yet.** Next: run `tools/eval.sh`, then record the magnesium bottle so the talk's
-  two-instruction demo exists.
+- [[2026-09-medicaments-vla]] — "Complejo B" box → ESP32 car. **WORKS: 80-90% success with SmolVLA**
+  (the early failures were camera order, not data — [[camera-order-matters]]). Dataset + both policies
+  are on the Hub under `Youngermaster/`.
+- **Next up:** [[14-two-instruction-demo]] — record the magnesium bottle (50 eps), merge, retrain.
+  That completes the talk's `demo-live` slide. Interaction is `tools/demo_live.sh` → `/subtask <frase>`.
 - [[2026-09-cubes-stacking-vla]] — planned: red/blue cubes, 4 instructions × 50 episodes, 3 cameras,
   the real version of the deck's animated "ahora el rojo, encima".
 - [[13-cross-machine-loop]] — record anywhere → Hub → train on the desktop → demo on the Mac.
@@ -43,6 +44,7 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 11. [[11-hub-sync]]
 12. [[12-recording-keys]]
 13. [[13-cross-machine-loop]]
+14. [[14-two-instruction-demo]]
 
 ## Experiments
 - [[_template]]
@@ -77,13 +79,17 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[smolvla-camera-slots]] — camera1/2/3 and the `--rename_map`; the third slot is free
 - [[lock-exposure-and-white-balance]] — `tools/lock_cameras.sh`; impossible on macOS
 - [[balance-the-instructions]] — multi-task datasets need equal, lexically distinct instructions
+- [[camera-order-matters]] — a swapped camera looks exactly like a badly trained policy
+- [[camera-indices-shift-on-replug]] — resolve by `/dev/v4l/by-id`, never a bare index
 
 ## Reference
 - [[troubleshooting]] — symptom table
 - [[timeline]] — chronological log
 - `tools/` — `env.sh`, `find.sh`, `teleop.sh`, `record.sh`, `train_act.sh`, `train_smolvla.sh`, `eval.sh`, `push_hub.sh`, `bench.py`, `eta.sh`;
   project runners `record_medicament_box.sh`, `overnight_medicament_box.sh`;
-  cross-machine `pull.sh`, `demo.sh`, `merge_tasks.sh`, `tasks.sh`, `lock_cameras.sh`, `bench_policy.py`
+  cross-machine `pull.sh`, `push_dataset.py`, `merge_tasks.sh`, `tasks.sh`, `lock_cameras.sh`, `bench_policy.py`;
+  demo `demo_live.sh` (interactive `/subtask`), `demo.sh` (one-shot);
+  setup `find_ports.sh` (both arms), `mac_cameras.sh` (macOS diagnosis)
 - `archive/` — [[SO100_PICK_AND_PLACE_GUIDE]], [[SO100_FOOLS_MATE_GUIDE]], [[vla-roadmap-2026-08]], [[reading-list]]
 - [[vla-demo-plan]] — presentation
 

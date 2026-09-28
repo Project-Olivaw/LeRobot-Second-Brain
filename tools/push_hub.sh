@@ -7,7 +7,9 @@ set -e; source "$(dirname "$0")/_common.sh"
 case "${1:-}" in
   dataset)
     NAME=${2:?local dataset name}; PRIV=${3:-true}
-    run "$RUN python -c \"from lerobot.datasets.lerobot_dataset import LeRobotDataset as D; D('${DATASET_PREFIX}/${NAME}').push_to_hub(repo_id='${HF_USER}/${NAME}', private=${PRIV^})\"" ;;
+    # LeRobotDataset.push_to_hub() takes NO repo_id — it uploads to self.repo_id, so a local/
+    # dataset must be re-pointed first or the push tries to create the namespace "local" (403).
+    run "$RUN python $(q "$VAULT_DIR/tools/push_dataset.py") $(q "${DATASET_PREFIX}/${NAME}") $(q "${HF_USER}/${NAME}") $(q "$PRIV")" ;;
   policy)
     JOB=${2:?job name}; CK=${3:-last}
     run "$RUN hf upload ${HF_USER}/${JOB} outputs/train/${JOB}/checkpoints/${CK}/pretrained_model" ;;

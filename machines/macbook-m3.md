@@ -4,9 +4,14 @@ Purpose: take the arms and cameras anywhere (the talk, another room), **record d
 them to the Hub**, run **inference** with a policy pulled from the Hub. Training happens on
 [[hf-cloud-gpu]] or the desktop, not here (no CUDA; `mps` works for ACT inference and light training only).
 
-Status (2026-09-13): **venv installed** at `~/GitHub/AnotherOnes/lerobot` (0.6.2-dev `8c894413c`, torch 2.11,
-`mps` available, `hf` CLI 1.30 inside the venv), **calibration copied**. Still `TODO`: ports and camera
-indices in `machines/macbook.env`, Accessibility permission, `uv run hf auth login`, first teleop.
+Status (2026-09-27): venv installed at `~/GitHub/AnotherOnes/lerobot` (0.6.2-dev `8c894413c`, torch 2.11,
+`mps` available, `hf` CLI 1.30 inside the venv), calibration copied. **Blocked on cameras** — the first
+probe saw only the built-in FaceTime camera plus one black feed, none of the three USB cameras
+(step 4 below is the fix). Still `TODO`: ports (`tools/find_ports.sh`), camera indices, Accessibility
+permission, `uv run hf auth login`, first teleop.
+
+The policy and dataset it needs are already on the Hub:
+`tools/pull.sh policy smolvla_so100_medicament_box`.
 Everything below is what changes versus [[desktop-ubuntu]]; the workflows are otherwise identical.
 
 ## First-time setup checklist
@@ -22,13 +27,47 @@ Everything below is what changes versus [[desktop-ubuntu]]; the workflows are ot
    Pin the same release the dataset/policy was made with when possible (desktop = 0.5.2). A newer
    release is fine for recording new datasets; note the version in the experiment note.
 2. Copy the calibration JSONs from `assets/calibration/` — commands in [[calibration]].
-3. Find ports: `uv run lerobot-find-port` — macOS names are `/dev/tty.usbmodem<serial>`; unlike Linux
-   they are **stable per physical device**, so once found, write them into `machines/macbook.env`.
-   No `chmod` needed on macOS.
-4. Find cameras: `uv run lerobot-find-cameras opencv` — backend is **AVFoundation**, ids are plain
-   integers, no `/dev/video*`. The built-in FaceTime camera is normally index 0; USB cams come after.
-   Open `outputs/captured_images/*.png` to map indices to `top` / `wrist` / `base`, then fill the env.
-   Keep `fourcc: MJPG` and 640x480@30 so the data matches the desktop datasets.
+3. **Find BOTH ports in one sitting:** `tools/find_ports.sh`.
+   `lerobot-find-port` detects **one bus per run** — it diffs the port list across a single unplug —
+   so a lone run only ever gives you one arm. The wrapper runs it twice (follower, then leader) and
+   prints the two `export` lines to paste into `machines/macbook.env`. macOS names
+   (`/dev/tty.usbmodem<serial>`) are **stable per physical device**, so once found they stay. No
+   `chmod` needed.
+
+
+4. **Cameras — this is the step that fails on macOS.** Run `tools/mac_cameras.sh` first; it
+   answers the three questions `lerobot-find-cameras` cannot:
+
+   - **Does macOS see the camera at all?** (`system_profiler SPCameraDataType`). If a USB camera is
+     missing *here*, it is a USB problem, not a LeRobot problem — see the hub/power notes below.
+   - **Does this terminal have camera permission?** A camera that opens but returns an **all-black
+     frame** is almost always permission: macOS hands out black frames instead of an error.
+     Fix in *System Settings → Privacy & Security → Camera*, enable your terminal app, then **fully
+     quit and reopen it**. The prompt only appears once; if it was dismissed, the app stays denied.
+   - **Which OpenCV index is which?** The script opens indices 0-7, warms each up and reports mean
+     brightness, so black feeds are labelled as such.
+
+   Known symptom (seen 2026-09): the probe returned **two** images — one completely black and one
+   from the **built-in FaceTime camera** — and none of the three USB cameras. That is the signature
+   of permission-denied plus index 0 being the internal camera. Work through, in order:
+
+   a. Grant camera permission to the terminal, quit and reopen it.
+   b. Turn off **Continuity Camera** (iPhone → Settings → General → AirPlay & Continuity), which
+      otherwise occupies an index.
+   c. Use a **powered** USB-C hub. Three UVC cameras plus two arms exceed what MacBook ports supply,
+      and an under-powered camera enumerates as nothing or as black frames.
+   d. Plug the cameras in **one at a time**, waiting for each to appear in `system_profiler`. Some
+      UVC cameras reserve full uncompressed bandwidth on connect, so three at once get refused where
+      three in sequence succeed.
+   e. Swap cables — thin/long USB cables are often charge-only or too lossy for 480 Mbit/s.
+
+   Then map indices to keys with `uv run lerobot-find-cameras opencv` and the saved PNGs in
+   `outputs/captured_images/`, and write them into `machines/macbook.env`. **Keep `top` / `wrist` /
+   `base` pointing at the same physical cameras as the desktop** — a swap silently ruins inference
+   ([[camera-order-matters]]). macOS has no `/dev/v4l/by-id` equivalent, so re-check the images
+   every session.
+
+
 5. `hf auth login` and set `HF_USER` (see [[hf-whoami-format]]); recording on the Mac should push to
    the Hub (`PUSH_TO_HUB=true` in the env) so [[hf-cloud-gpu]] can train.
 6. Recording keys: LeRobot's keyboard listener (`pynput`) needs the terminal app to be allowed under
