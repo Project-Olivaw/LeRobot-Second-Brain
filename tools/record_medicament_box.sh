@@ -21,9 +21,11 @@ case "$VER" in 0.6*) ;; *) echo "expected lerobot 0.6.x (pinned to the MacBook's
 for dev in "$ROBOT_PORT" "$TELEOP_PORT"; do
   [ -e "$dev" ] || { echo "missing $dev — ports swap on replug, run tools/find.sh" >&2; exit 1; }
 done
-for idx in $(grep -o 'index_or_path: [0-9]*' <<<"$CAMERAS" | grep -o '[0-9]*$'); do
-  [ -e "/dev/video$idx" ] || { echo "missing /dev/video$idx — run tools/find.sh" >&2; exit 1; }
-done
+# Cross-platform: macOS has no /dev/video*, and an index that exists can still hand back black
+# frames. check_cameras.py opens each camera and verifies it returns a live image.
+if [ "${SKIP_CAM_CHECK:-0}" != 1 ]; then
+  CAMERAS="$CAMERAS" $RUN python "$TOOLS/check_cameras.py" || exit 1
+fi
 
 DS="$HOME/.cache/huggingface/lerobot/${DATASET_PREFIX}/${NAME}"
 if [ -d "$DS" ] && [ "${RESUME:-0}" != 1 ]; then

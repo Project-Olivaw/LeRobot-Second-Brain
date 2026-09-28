@@ -17,25 +17,31 @@ echo "  enable your terminal app (Ghostty/iTerm/Terminal), then FULLY QUIT and r
 echo "  A permission prompt only appears the first time a process asks; if you dismissed it, the"
 echo "  app stays denied until you toggle it there."
 
-printf '\n\033[1m3. What OpenCV can open, index by index\033[0m\n'
-$RUN python - <<'PY'
-import cv2, numpy as np
+printf '\n\033[1m3. What OpenCV can open, index by index (one PNG saved per index)\033[0m\n'
+SHOTS="${SHOTS:-$LEROBOT_DIR/outputs/mac_cameras}"
+SHOTS="$SHOTS" $RUN python - <<'PY'
+import os, cv2, numpy as np
+shots = os.environ["SHOTS"]; os.makedirs(shots, exist_ok=True)
 found = []
 for i in range(8):
     cap = cv2.VideoCapture(i)          # AVFoundation on macOS
     if not cap.isOpened():
         cap.release(); continue
-    for _ in range(8): ok, frame = cap.read()   # warm up; first frames are often empty
+    # probe at the size we actually record at, so the numbers mean something
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640); cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480); cap.set(cv2.CAP_PROP_FPS, 30)
+    for _ in range(12): ok, frame = cap.read()   # warm up; first frames are often empty
     w, h = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     if ok and frame is not None:
         mean = float(np.mean(frame)); std = float(np.std(frame))
         verdict = "BLACK (permission? lens cap? unpowered hub?)" if mean < 3 and std < 3 else "live image"
-        print(f"  index {i}: {w}x{h}  mean={mean:5.1f} std={std:5.1f}  -> {verdict}")
+        path = os.path.join(shots, f"idx{i}.png"); cv2.imwrite(path, frame)
+        print(f"  index {i}: {w}x{h}  mean={mean:5.1f} std={std:5.1f}  -> {verdict}   {path}")
         found.append(i)
     else:
         print(f"  index {i}: opens but returns no frame")
     cap.release()
 print(f"\n  usable indices: {found}" if found else "\n  no cameras opened at all")
+print(f"  open the PNGs to see which is which:  open {shots}")
 PY
 
 printf '\n\033[1m4. Save one frame per index so you can tell top / wrist / base apart\033[0m\n'

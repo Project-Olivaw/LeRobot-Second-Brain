@@ -25,6 +25,8 @@ session transcripts themselves were purged on 2026-09-13; everything below is wh
 | 2026-09-13 20:15 → 21:00 | "VLA by 22:30 with 10 episodes?" analysed on the MacBook → no. Mac venv installed (0.6.2-dev, needs `core_scripts`), calibration copied, vault install lines fixed. **Decision: 50 episodes on the desktop, ACT → SmolVLA overnight, evaluate 09-14.** Four lessons written. | [[2026-09-medicaments-vla]], [[no-same-evening-vla]] |
 | 2026-09-13 22:00 → 22:30 | Desktop aligned to lerobot **0.6.2 @ `8c894413c`** via `uv sync` (extras core_scripts/feetech/smolvla/training); GPU bf16, CLI flags, `smolvla_base` download and a real arms+2-camera connect verified. Conda `lerobot` found to be a pip 0.5.1 unrelated to the checkout (not recreated). Target changed to the **ESP32 car**; task string fixed; `tools/record_medicament_box.sh`, `tools/overnight_medicament_box.sh`, `tools/eta.sh` written. Recording 50 episodes starts. | [[2026-09-medicaments-vla]], [[conda-env-is-not-the-checkout]] |
 
+| 2026-09-27 | MacBook teleop configured: both arm ports written and **verified read-only** via stored homing offsets (`tools/identify_arms.py`, 6/6 each). Camera pre-flight (`tools/check_cameras.py`) and macOS frame-saving probe added. Decision: record the two-instruction dataset fresh in Spanish, 100 + 100, both objects in frame. Confirmed ACT has no language input. | [[14-two-instruction-demo]], [[identify-arms-by-homing-offset]], [[act-has-no-language-input]] |
+
 ## Resumen (ES)
 
 Cronología: servo quemado y firmware (mayo), calibración y primer ACT con Lego (junio, leader roto en

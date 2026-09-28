@@ -29,6 +29,10 @@
 | Policy fails on a different table / at the venue | background out of distribution | bring the scene kit — [[policy-does-not-survive-a-new-table]] |
 | Checkpoint fails to load on the other machine (`config.json` field errors) | lerobot version mismatch | same commit on both — [[policy-travels-as-a-folder]] |
 | "Can we have a VLA tonight?" | data + compute floors | [[no-same-evening-vla]] |
+| `Could not connect on port '...TODO'` | profile still has the placeholder port | fill `machines/<machine>.env` — [[02-find-ports]] |
+| Follower goes limp / drops at teleop start | leader and follower ports swapped | `uv run python tools/identify_arms.py` — [[identify-arms-by-homing-offset]] |
+| Camera opens but every frame is black (macOS) | terminal lacks Camera permission, or index shifted | `tools/mac_cameras.sh`, `tools/check_cameras.py` — [[camera-indices-shift-on-replug]] |
+| Multi-instruction policy ignores the sentence | trained ACT, or one object per dataset | [[act-has-no-language-input]], [[balance-the-instructions]] |
 | SmolVLA training dies in ~90 s with a camera-name error | `smolvla_base` expects `camera1/2/3` | pass `--rename_map` — [[smolvla-camera-slots]] |
 | Arm pauses rhythmically during a rollout | chunk recompute is slower than the control period | `--inference.type=rtc`; measure with `tools/bench_policy.py` — [[policy-inference-is-bursty]] |
 | Policy works at home, fails at the venue | light/background changed; auto-exposure shifted | bring the scene kit, lock the cameras — [[scene-kit]], [[lock-exposure-and-white-balance]] |

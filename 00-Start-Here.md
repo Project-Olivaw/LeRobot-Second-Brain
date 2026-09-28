@@ -74,6 +74,8 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[policy-does-not-survive-a-new-table]] — bring the scene, not a new model
 - [[policy-travels-as-a-folder]] — desktop → Mac: Hub or USB, same version, same keys
 - [[lerobot-06-extras]] — 0.6.x needs `--extra core_scripts`
+- [[act-has-no-language-input]] — ACT never sees the instruction; it cannot be the language fallback
+- [[identify-arms-by-homing-offset]] — which port is the leader, read-only, before any torque
 - [[conda-env-is-not-the-checkout]] — `git pull` does not touch the pip conda env; `uv sync` after every checkout
 - [[policy-inference-is-bursty]] — measure the chunk recompute, not the average (SmolVLA 152 ms on the 5060 Ti)
 - [[smolvla-camera-slots]] — camera1/2/3 and the `--rename_map`; the third slot is free
@@ -86,10 +88,11 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[troubleshooting]] — symptom table
 - [[timeline]] — chronological log
 - `tools/` — `env.sh`, `find.sh`, `teleop.sh`, `record.sh`, `train_act.sh`, `train_smolvla.sh`, `eval.sh`, `push_hub.sh`, `bench.py`, `eta.sh`;
-  project runners `record_medicament_box.sh`, `overnight_medicament_box.sh`;
+  project runners `record_medicament_box.sh`, `record_medicamentos.sh` (two-instruction halves, `--plan`), `overnight_medicament_box.sh`;
   cross-machine `pull.sh`, `push_dataset.py`, `merge_tasks.sh`, `tasks.sh`, `lock_cameras.sh`, `bench_policy.py`;
   demo `demo_live.sh` (interactive `/subtask`), `demo.sh` (one-shot);
-  setup `find_ports.sh` (both arms), `mac_cameras.sh` (macOS diagnosis)
+  setup `find_ports.sh` (both arms), `identify_arms.py` (which port is which, read-only),
+  `mac_cameras.sh` (macOS diagnosis), `check_cameras.py` (pre-flight before a long session)
 - `archive/` — [[SO100_PICK_AND_PLACE_GUIDE]], [[SO100_FOOLS_MATE_GUIDE]], [[vla-roadmap-2026-08]], [[reading-list]]
 - [[vla-demo-plan]] — presentation
 
