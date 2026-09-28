@@ -1,6 +1,6 @@
 # 2026-09 — Medicament boxes / bottles — SmolVLA (recording)
 
-**Status:** **recording 2026-09-13 night** ("Complejo B" box → ESP32 car), ACT → SmolVLA overnight on the desktop, evaluate 2026-09-14
+**Status:** **trained, never evaluated** — 50 episodes recorded, ACT and SmolVLA both finished 2026-09-14. No rollout has been run on the arm yet; the Evaluation table below is still empty. Nothing is on the Hub.
 **Machine:** record on **desktop** (already set up), train on **desktop** overnight (HF Jobs as backup), demo on **macbook**
 **lerobot version:** **0.6.2 @ `8c894413c`** on both machines (desktop `uv run`, verified 2026-09-13 22:15; Mac venv) — see "Version alignment" below
 
@@ -110,14 +110,59 @@ Push the chosen checkpoint to the Hub afterwards ([[11-hub-sync]]) so the Mac ca
 | `local/so100_medicament_box` (desktop) → `${HF_USER}/so100_medicament_box` | 50 planned | — | 30 | — | desktop cache, then Hub (private) |
 | `${HF_USER}/so100_medicament_bottle` | — | — | 30 | — | Hub (private) |
 
-## Training
-(fill: job id, flavor, steps, wall-clock, loss)
+## Dataset (recorded)
 
-## Evaluation
-(fill: grid results per checkpoint, ACT vs SmolVLA)
+`local/so100_medicament_box` — **50 episodes, 38 748 frames, 1 task, 30 fps, 1.2 GB**, cameras
+`top` + `wrist` at 640x480. Average episode 25.8 s. Task string:
+`Pick up the Complejo B medicament box and place it on the ESP32 car`
+(`tools/tasks.sh so100_medicament_box`).
+
+## Training (done)
+
+| Run | steps | batch | wall-clock | s/step | final loss | dir size |
+|---|---|---|---|---|---|---|
+| `act_so100_medicament_box` | 20 000 | 8 | **1 h 04** (2026-09-13 23:24 → 00:29) | 0.19 | 0.12 (l1 0.108) | 4.7 GB |
+| `smolvla_so100_medicament_box` | 30 000 | 8 | **1 h 41** (2026-09-14 05:52 → 07:33) | 0.21 | **0.032** (from 0.379) | 15 GB |
+
+The SmolVLA run took **3 GB of VRAM** at batch 8 with the vision encoder frozen — the 5060 Ti was
+nowhere near full, so batch 16-32 (or `--policy.freeze_vision_encoder=false`) is available next time.
+It also ran ~2.5x faster than HF's "20k steps ≈ 4 h on an A100" figure suggests, because that number
+is for batch 64.
+
+First attempt (2026-09-14 00:29) **failed in 90 s**: `lerobot/smolvla_base` was pretrained with
+cameras named `camera1/2/3` and 0.6 rejects other names. Fixed with `--rename_map`
+([[smolvla-camera-slots]]) and relaunched at 05:52.
+
+Measured inference cost (`tools/bench_policy.py`, 5060 Ti): SmolVLA recomputes a 50-step chunk in
+**152 ms** every 1.7 s (ACT: 10 ms per 100-step chunk). See [[policy-inference-is-bursty]] — the Mac
+must be measured separately before the talk.
+
+## Evaluation — NOT DONE
+
+Nothing has been run on the arm. Next session, with the scene set up as it was on 2026-09-13:
+
+```bash
+source tools/env.sh desktop
+tools/eval.sh so100_medicament_box \
+  outputs/train/smolvla_so100_medicament_box/checkpoints/last/pretrained_model 10
+# quick look without recording: ... 0   (strategy base, 30 s)
+```
+
+Then fill: successes /10 per checkpoint, ACT vs SmolVLA, and whether it generalises to unseen spots.
+
+## Next for the talk
+
+The deck's live demo needs **two** instructions ([[vla-demo-plan]]). Only the box exists. To finish it:
+record `so100_medicament_bottle` (50 eps, `agarra el frasco de magnesio`, magnesium bottle, same
+scene, box present as distractor), merge with `tools/merge_tasks.sh`, retrain. The cube version of
+the same idea is [[2026-09-cubes-stacking-vla]].
+
+Note the task strings are currently **English** while the deck says them in **Spanish** on stage.
+Re-record or re-label (`lerobot-edit-dataset --operation.type=modify_tasks`) so the instruction you
+say out loud is the instruction the policy was trained on.
 
 ## Open questions
-- HF username to use (Youngermaster vs jayounghoyos) — set `HF_USER` in `machines/macbook.env`.
+- ~~HF username~~ → **Youngermaster** (confirmed 2026-09-27). Nothing pushed yet.
 - Whether the installed lerobot accepts a list in `--dataset.repo_id` for multi-dataset training, or
   whether `lerobot-edit-dataset` merge is needed.
 - SmolVLA inference rate on `mps`; if < 10 Hz, run the demo from the ACT baseline or use RTC.

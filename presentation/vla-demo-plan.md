@@ -4,14 +4,40 @@ Slides repo: https://github.com/Youngermaster/VLA-introduction-slides (Slidev, E
 offline). The deck's title metaphor says "SO-101"; **the hardware on stage is an SO-100 pair** —
 say "SO-ARM100 / SO-100" when pointing at the arm, or fix the wording in the deck.
 
-## What the demo should show
+## What the deck already commits to (read this before changing anything)
 
-1. **Teleoperation** (10 s): leader moves, follower mirrors — "this is how the data is collected".
-2. **Policy rollout**: the arm picks the medicament box and places it in the tray on an instruction.
-   With SmolVLA, say the instruction out loud as you type it: `Pick up the medicament box and place it in the tray`.
-3. **Language conditioning** (if the bottle dataset is done): same scene, change the noun → different object.
-4. **Fallback**: `lerobot-replay` of a recorded episode ([[07-inspect-replay]]) — identical motion, no
-   inference. Keep it ready in a second terminal; the audience still sees the arm move.
+Slide `demo-live` (`slides.md:439-487`) and `monologue/es.md` §demo-live promise **exactly two
+instructions, 4 minutes, act 04 of 5**:
+
+1. `agarra el Complejo B` — run it, **stay silent while it runs**.
+2. Reposition the objects.
+3. Change **only the sentence** to `agarra el frasco de magnesio`, saying it out loud while typing.
+4. When the arm goes to the other object — stop talking and let them applaud.
+5. Then: *"No hay un if en ninguna parte."*
+
+Failure protocol is already written: do not retry more than twice, press **B** for the backup video,
+move on without drama (`backup-demo`, `slides.md:514`).
+
+So the demo is **language conditioning on two medicine objects** — not stacking. "Agarra el rojo,
+encima" belongs to the *animated* `act-vs-vla` scene; making it real is [[2026-09-cubes-stacking-vla]].
+
+### Gaps between the deck and reality (2026-09-27)
+
+| Deck says | Reality | Fix |
+|---|---|---|
+| `--policy.path=$HF_USER/smolvla-medicamentos` | nothing is on the Hub; the policy is a local checkpoint named `smolvla_so100_medicament_box` | push it ([[11-hub-sync]]) and align the name, or edit `slides.md:465` |
+| `--robot.type=so101_follower` (`slides.md:466`) | the arm is an **SO-100** | change to `so100_follower` — this line is run on stage |
+| two instructions | only the box dataset exists (50 eps); no magnesium bottle | record the bottle dataset ([[2026-09-medicaments-vla]]) |
+| `agarra el Complejo B` (Spanish) | the dataset's task string is English | re-record or `modify_tasks`; the sentence you say must be the sentence it was trained on |
+| "SO-101" in 15 places (README, locales, monologue) | SO-100 | cosmetic except `slides.md:466`, but worth fixing for honesty |
+| `--device=mps` | correct for `lerobot-rollout` (`--policy.device` is the *training* flag) | the deck's own stage note already says this — it is right |
+
+## Running it
+
+`tools/demo.sh "<instruction>" [seconds]` is that command wired to the current machine (it reads
+ports, cameras and the rename map, and enables `--inference.type=rtc`). Fallback:
+`lerobot-replay` of a recorded episode ([[07-inspect-replay]]) — identical motion, no inference.
+Keep it ready in a second terminal; the audience still sees the arm move.
 
 ## Machine on stage: MacBook Pro M3 ([[macbook-m3]])
 
@@ -24,7 +50,12 @@ Pre-flight (**a week before** for the `mps` dry run; the rest the day before, on
 - [ ] `machines/macbook.env` filled and committed (ports, camera indices).
 - [ ] Calibration JSONs copied; `tools/teleop.sh` shows no offset.
 - [ ] Policy pulled: `uv run hf download ${HF_USER}/<policy>`; dataset for replay pulled.
+- [ ] `uv run python tools/bench_policy.py "$DEMO_POLICY" mps` — the recompute must stay well under
+      the chunk duration, or the arm stutters ([[policy-inference-is-bursty]]). On the 5060 Ti it is
+      152 ms per chunk; if the Mac is over ~1.5 s, demo the ACT policy instead.
 - [ ] Inference dry run with `tools/eval.sh` at the venue lighting if possible; measure loop rate.
+- [ ] Exposure/white balance: cannot be locked on macOS ([[lock-exposure-and-white-balance]]) — bring
+      your own light and re-check the feeds at the venue.
 - [ ] Terminal has Accessibility permission (arrow keys).
 - [ ] rerun window arranged on the projector (camera feeds are a good visual).
 - [ ] Scene kit: mat with spawn area, tray, box, bottle, wrist light, tape to fix everything.

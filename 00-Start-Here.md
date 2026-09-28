@@ -7,16 +7,20 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - Two ACT policies were trained on the desktop: [[2026-06-29-lego-skeleton-act]] (worked as a
   pipeline test, 13 episodes) and [[2026-07-13-fools-mate-act]] (50 episodes, 3 cameras, **failed at eval**).
 - Hardware: SO-100 leader + follower, 3 USB cameras. See [[so100-arms]], [[cameras]].
-- Now: [[2026-09-medicaments-vla]] — "Complejo B" box → ESP32 car, **recording 2026-09-13 night** on the
-  desktop (lerobot 0.6.2 via `uv run`), 50 episodes (5 spots × 10), ACT → SmolVLA overnight on the 5060 Ti,
-  demo from the MacBook via the Hub.
-  Feeds the talk in [[vla-demo-plan]].
+- [[2026-09-medicaments-vla]] — "Complejo B" box → ESP32 car. 50 episodes recorded; **ACT (20k, 1 h) and
+  SmolVLA (30k, 1 h 41, loss 0.032) both trained 2026-09-14 — but never evaluated on the arm, and nothing
+  is on the Hub yet.** Next: run `tools/eval.sh`, then record the magnesium bottle so the talk's
+  two-instruction demo exists.
+- [[2026-09-cubes-stacking-vla]] — planned: red/blue cubes, 4 instructions × 50 episodes, 3 cameras,
+  the real version of the deck's animated "ahora el rojo, encima".
+- [[13-cross-machine-loop]] — record anywhere → Hub → train on the desktop → demo on the Mac.
 - MacBook: venv ready (0.6.2-dev), calibration copied; ports/camera indices still `TODO` ([[macbook-m3]]).
 
 ## Hardware
 - [[so100-arms]] — motors, ids, SO-100 vs SO-101
 - [[calibration]] — files, why they travel with the repo, consistency rules
 - [[cameras]] — top / wrist / base, indices, MJPG, USB bandwidth
+- [[scene-kit]] — the green mat, what travels with the arm, fixed vs varied
 - [[feetech-firmware]] — the 3.9 vs 3.10 mismatch and the Windows VM fix
 - [[hardware-history]] — burned servo, broken leader, aborted evals
 
@@ -38,12 +42,14 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 10. [[10-evaluate]]
 11. [[11-hub-sync]]
 12. [[12-recording-keys]]
+13. [[13-cross-machine-loop]]
 
 ## Experiments
 - [[_template]]
 - [[2026-06-29-lego-skeleton-act]]
 - [[2026-07-13-fools-mate-act]]
 - [[2026-09-medicaments-vla]]
+- [[2026-09-cubes-stacking-vla]]
 
 ## Lessons (one idea each)
 - [[mjpg-required-for-30fps]]
@@ -67,17 +73,23 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[policy-travels-as-a-folder]] — desktop → Mac: Hub or USB, same version, same keys
 - [[lerobot-06-extras]] — 0.6.x needs `--extra core_scripts`
 - [[conda-env-is-not-the-checkout]] — `git pull` does not touch the pip conda env; `uv sync` after every checkout
+- [[policy-inference-is-bursty]] — measure the chunk recompute, not the average (SmolVLA 152 ms on the 5060 Ti)
+- [[smolvla-camera-slots]] — camera1/2/3 and the `--rename_map`; the third slot is free
+- [[lock-exposure-and-white-balance]] — `tools/lock_cameras.sh`; impossible on macOS
+- [[balance-the-instructions]] — multi-task datasets need equal, lexically distinct instructions
 
 ## Reference
 - [[troubleshooting]] — symptom table
 - [[timeline]] — chronological log
 - `tools/` — `env.sh`, `find.sh`, `teleop.sh`, `record.sh`, `train_act.sh`, `train_smolvla.sh`, `eval.sh`, `push_hub.sh`, `bench.py`, `eta.sh`;
-  project runners `record_medicament_box.sh`, `overnight_medicament_box.sh`
+  project runners `record_medicament_box.sh`, `overnight_medicament_box.sh`;
+  cross-machine `pull.sh`, `demo.sh`, `merge_tasks.sh`, `tasks.sh`, `lock_cameras.sh`, `bench_policy.py`
 - `archive/` — [[SO100_PICK_AND_PLACE_GUIDE]], [[SO100_FOOLS_MATE_GUIDE]], [[vla-roadmap-2026-08]], [[reading-list]]
 - [[vla-demo-plan]] — presentation
 
 ## Resumen (ES)
 
-Índice del vault. Estado: dos políticas ACT entrenadas (Lego OK como prueba, Fool's mate falló),
-hardware SO-100 con 3 cámaras, siguiente proyecto medicamentos con SmolVLA. Sigue los workflows
-en orden numérico y consulta lecciones cuando algo falle.
+Índice del vault. Estado: SmolVLA de la caja de medicamento **entrenado pero sin evaluar**; falta el
+frasco de magnesio para el demo de dos instrucciones de la charla. Planeado: cubos rojo/azul con
+apilado (4 instrucciones × 50 episodios, 3 cámaras). El bucle entre máquinas (grabar → Hub →
+entrenar → demo en la Mac) está en [[13-cross-machine-loop]].
