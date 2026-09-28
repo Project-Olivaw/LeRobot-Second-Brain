@@ -4,12 +4,15 @@
 |---|---|---|
 | `failed to set fps=30 (actual_fps=20.0)` | camera in raw YUYV mode | add `fourcc: MJPG` — [[mjpg-required-for-30fps]] |
 | `failed to set capture_width=640 (actual_width=1920)` / `failed to set fourcc=MJPG` | opened by `/dev/videoN` string → FFMPEG backend | use integer index — [[integer-index-not-dev-path]] |
+| A camera reports `absent` / only two feeds although three are plugged in | two cameras of the same model share one `/dev/v4l/by-id` name | pin the USB port with `CAM_*_PATH` — [[identical-cameras-need-by-path]] |
 | A camera fails only when all three are attached | USB bandwidth / power | [[usb-bandwidth-three-cams]] |
 | Wrong camera under a key (wrist/base swapped) | indices shifted | re-probe and look at the PNGs — [[04-find-cameras]] |
 | `ConnectionError ... Incorrect status packet` | servo bus / power glitch | retry, reseat, PSU, port — [[incorrect-status-packet]] |
 | `Could not open port` / permission denied | wrong port or not in `dialout` | [[02-find-ports]] |
 | `lerobot-calibrate`: firmware version mismatch | motors on 3.9 and 3.10 | flash via FD in the Win11 VM — [[feetech-firmware]] |
 | Follower offset vs leader during teleop | different homing pose at calibration | recalibrate both — [[calibrate-same-pose]] |
+| `resume() requires an explicit 'root' directory` | 0.6.2 refuses to open a writer without `--dataset.root` | pass it (tools/record.sh does) — [[resume-needs-dataset-root]] |
+| Resumed recording overshoots the episode target / a half-episode is in the dataset | `num_episodes` counts this run; Esc mid-episode saves the stub | pass the target to `record_medicamentos.sh`; → then Esc, or ← then Esc — [[resume-counts-this-run]] |
 | `FileExistsError` on record/eval | dataset folder already exists | delete or unique name — [[file-exists-error-on-record]] |
 | `FileExistsError` on train | `output_dir` exists | new name / `--resume` — [[train-refuses-to-overwrite]] |
 | Task label looks like a dict | colon/apostrophe in `single_task` | [[single-task-no-colons]] |

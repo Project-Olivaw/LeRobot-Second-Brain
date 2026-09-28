@@ -21,7 +21,7 @@ tools/demo_live.sh               # uses $DEMO_POLICY and $DEMO_TASK1 from the pr
 ```
 /start                                   # the robot does nothing until you type this
    … it picks the Complejo B and puts it on the board …
-/subtask agarra el frasco de magnesio    # say it out loud while you type it
+/subtask agarra el frasco de zinc    # say it out loud while you type it
    … same weights, same process — it goes to the other object …
 /reset                                   # back to the initial pose, hold
 /stop
@@ -43,7 +43,7 @@ frame** — and relabelling cannot add a distractor that was never filmed. Recor
 ```bash
 source tools/env.sh macbook              # or desktop
 tools/record_medicamentos.sh frasco --plan    # read the spot/side schedule first
-tools/record_medicamentos.sh frasco 100       # "agarra el frasco de magnesio"
+tools/record_medicamentos.sh frasco 100       # "agarra el frasco de zinc"
 tools/record_medicamentos.sh caja   100       # "agarra la caja de Complejo B"
 ```
 
@@ -52,6 +52,32 @@ version, identifies both arms from their homing offsets ([[identify-arms-by-homi
 pre-flights the cameras (`tools/check_cameras.py`), and prints the schedule:
 **5 spawn spots x 2 sides x N repeats**, ten blocks. Record a block, press Esc, move the objects,
 then continue the same dataset with `RESUME=1`. 100 episodes in one unbroken sitting is not a plan.
+
+### How many cameras — three, all the way through
+
+Record, train, evaluate and demo with **`top` + `wrist` + `base`**. `$CAMERAS` resolves to every
+camera the profile finds, so `tools/record_medicamentos.sh` uses three with no flag and refuses to
+start if one is missing ([[identical-cameras-need-by-path]]). `tools/train_smolvla.sh` maps the three
+keys onto the slots `smolvla_base` was pretrained with (top→camera1, wrist→camera2, base→camera3) and
+stores that map in the checkpoint; `tools/eval.sh`, `tools/demo.sh` and `tools/demo_live.sh` read it
+back out, so the same policy runs on the desktop and on the Mac with no flags to remember.
+
+`smolvla_base` has exactly three camera slots, so three is the most this architecture takes — the
+dataset uses the whole model rather than leaving a slot empty, and `base` is the view that sees the
+gap between the object and the board when the wrist camera is occluded by the gripper.
+
+What it costs, and the one dependency to plan for:
+
+- Training is roughly **+50% per step** over the 2-camera run (0.21 s/step measured there), so budget
+  **~3 h 20 for 40k steps** instead of ~2 h 20. Confirm against `updt_s` in the first two minutes
+  ([[updt-s-is-your-timer]]) rather than trusting that estimate.
+- Recording is ~50% more disk: roughly **9-10 GB for the 200 episodes** (the 50-episode 2-camera box
+  dataset was 1.2 GB).
+- **The demo machine must provide all three cameras.** On stage that means the MacBook with three
+  working USB cameras — the reason for the second hub. If a camera dies at the venue, the fallback is
+  not "run it with two" (the policy refuses); it is to run the demo from the desktop, or to derive a
+  2-camera dataset and policy in advance as insurance:
+  `tools/drop_camera.sh so100_medicamentos so100_medicamentos_2cam base`, then train that too.
 
 On Linux also run `tools/lock_cameras.sh` first (exposure/WB —
 [[lock-exposure-and-white-balance]]); on macOS UVC exposure is not settable from the CLI, so fix the
@@ -122,14 +148,15 @@ tools/tasks.sh so100_medicamentos        # must show ~50/50, two distinct instru
 ## Step 3 — train
 
 ```bash
-RENAME_MAP='{"observation.images.top": "observation.images.camera1",
-             "observation.images.wrist": "observation.images.camera2"}' \
-tools/train_smolvla.sh so100_medicamentos 30000
+tools/train_smolvla.sh so100_medicamentos 40000
 ```
 
+The `--rename_map` (top/wrist/base → camera1/2/3) is derived from the dataset by the wrapper and
+saved into the checkpoint — nothing downstream has to know it ([[smolvla-rename-map]]).
+
 Measured reference from the single-task box run: **30k steps = 1 h 41 at 0.21 s/step, batch 8, 3 GB
-VRAM**. With 200 episodes and two instructions, budget **40k steps (~2 h 20)** and keep 30k as the
-floor; scale `--policy.scheduler_decay_steps` with `--steps` either way.
+VRAM with two cameras**. With 200 episodes, two instructions and three cameras, budget **40k steps
+(~3 h 20)** and keep 30k as the floor; scale `--policy.scheduler_decay_steps` with `--steps` either way.
 
 **Do not train ACT on the merged dataset.** ACT has no tokenizer and never sees the instruction
 (verified in 0.6.2), so with both objects in frame it averages the two target trajectories and
@@ -186,9 +213,9 @@ making the two datasets *identical except for the object and the sentence* inste
 ## Resumen (ES)
 
 El demo de la charla: una política, dos objetos, dos frases. Se interactúa con
-`tools/demo_live.sh` — un solo proceso, `/start` y luego `/subtask agarra el frasco de magnesio`
+`tools/demo_live.sh` — un solo proceso, `/start` y luego `/subtask agarra el frasco de zinc`
 para cambiar la instrucción en vivo sin recargar nada. Falta grabar 50 episodios del frasco
-(`agarra el frasco de magnesio`) **con la caja presente en cuadro**, y la caja debe tener el frasco
+(`agarra el frasco de zinc`) **con la caja presente en cuadro**, y la caja debe tener el frasco
 presente también: si cada dataset solo contiene su objeto, el modelo nunca aprende a leer la frase.
 Decisión del 2026-09-27: grabar **las dos mitades desde cero en español**, 100 + 100 episodios
 (`tools/record_medicamentos.sh frasco|caja`), en bloques de 10 con `RESUME=1`, **siempre con los dos

@@ -6,7 +6,7 @@ Recording is a loop of *record phase* → *reset phase* per episode. You control
 |---|---|
 | **→** (Right arrow) | End the current phase **now** and advance (end the episode after the object is placed; skip the reset wait). |
 | **←** (Left arrow) | **Discard** the current episode and re-record it. Keep bad demos out. |
-| **Esc** | Stop the whole session. Episodes already saved are kept (and uploaded if `push_to_hub=true`). |
+| **Esc** | Stop the whole session. Episodes already saved are kept (and uploaded if `push_to_hub=true`). **Pressing it mid-episode saves the truncated episode** — press → or ← first ([[resume-counts-this-run]]). |
 
 Per episode: (1) record until you press → or `episode_time_s` elapses; (2) reset the scene during
 `reset_time_s` or press →; (3) auto-save, counter advances. There is no confirm step.

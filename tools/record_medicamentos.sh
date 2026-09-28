@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Record ONE half of the two-instruction demo dataset (workflows/14-two-instruction-demo.md).
 #
-#   tools/record_medicamentos.sh frasco [episodes=100]   -> "agarra el frasco de magnesio"
+#   tools/record_medicamentos.sh frasco [episodes=100]   -> "agarra el frasco de zinc"
 #   tools/record_medicamentos.sh caja   [episodes=100]   -> "agarra la caja de Complejo B"
 #   tools/record_medicamentos.sh <which> --plan          -> print the spot/side schedule and exit
 #
 # Env: RESUME=1 append to an existing dataset (how you record 100 episodes across several sittings)
-#      CAMS="$CAMERAS_THREE" record three cameras   |   DRY=1 print the command only
+#      CAMS="$CAMERAS_TWO" record only top+wrist ($CAMERAS = every camera found)  |  DRY=1 print only
 #      SKIP_CAM_CHECK=1 skip the camera pre-flight (don't)
 # Keys while recording: -> end episode now, <- discard & redo, Esc stop (workflows/12-recording-keys.md).
 #
@@ -18,14 +18,14 @@ TOOLS="$(cd "$(dirname "$0")" && pwd)"; VAULT="$(dirname "$TOOLS")"
 
 WHICH=${1:?which half: frasco | caja}; shift || true
 case "$WHICH" in
-  frasco) NAME=so100_medicamento_frasco; TASK="agarra el frasco de magnesio";  TARGET="frasco de magnesio (bottle)";;
+  frasco) NAME=so100_medicamento_frasco; TASK="agarra el frasco de zinc";  TARGET="frasco de zinc (bottle)";;
   caja)   NAME=so100_medicamento_caja;   TASK="agarra la caja de Complejo B"; TARGET="caja de Complejo B (box)";;
   *) echo "unknown half '$WHICH' — use: frasco | caja" >&2; exit 1;;
 esac
 case "$TASK" in *:*|*\'*) echo "task string must not contain ':' or \"'\"" >&2; exit 1;; esac
 
-PLAN=0; EPS=100
-for arg in "$@"; do case "$arg" in --plan) PLAN=1;; ''|*[!0-9]*) ;; *) EPS=$arg;; esac; done
+PLAN=0; EPS=100; TARGET=100
+for arg in "$@"; do case "$arg" in --plan) PLAN=1;; ''|*[!0-9]*) ;; *) EPS=$arg; TARGET=$arg;; esac; done
 EPISODE_TIME_S=${EPISODE_TIME_S:-30}; RESET_TIME_S=${RESET_TIME_S:-10}
 
 # --- the recording schedule: 5 spawn spots x 2 sides x N repeats -------------------------------
@@ -33,7 +33,7 @@ EPISODE_TIME_S=${EPISODE_TIME_S:-30}; RESET_TIME_S=${RESET_TIME_S:-10}
 # from learning "always go left" instead of reading the instruction.
 SPOTS=(front-left front-right centre back-left back-right)
 plan() {
-  local per_block=$((EPS / 10)) n=0
+  local per_block=$((TARGET / 10)) n=0
   printf '\n  %-3s %-12s %-16s %s\n' "#" "spawn spot" "target is on the" "episodes"
   printf '  %s\n' "-------------------------------------------------------------"
   for side in LEFT RIGHT; do
@@ -44,8 +44,8 @@ plan() {
   done
   cat <<PLANNOTE
 
-  $EPS episodes = 10 blocks x $per_block. Record a block, stop with Esc, move the objects, then
-  continue with:  RESUME=1 tools/record_medicamentos.sh $WHICH $EPS
+  $TARGET episodes = 10 blocks x $per_block. Record a block, stop with Esc, move the objects, then
+  continue with:  RESUME=1 tools/record_medicamentos.sh $WHICH $TARGET   (same target; it records only what is missing)
   Within a block vary the object's yaw every episode; keep the same approach path.
 PLANNOTE
 }
@@ -74,13 +74,28 @@ if [ -d "$DS" ] && [ "${RESUME:-0}" != 1 ]; then
   echo "  append:  RESUME=1 $0 $WHICH $EPS      |  start over:  rm -rf $DS" >&2
   exit 1
 fi
+# EPS is the TARGET for the whole dataset, but --dataset.num_episodes counts episodes recorded in
+# THIS run. On resume, ask for the remainder — otherwise 'RESUME=1 ... 100' would add 100 more on top
+# of what is already there (lessons/resume-counts-this-run.md).
+HAVE=0
+if [ "${RESUME:-0}" = 1 ] && [ -f "$DS/meta/info.json" ]; then
+  HAVE=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['total_episodes'])" "$DS/meta/info.json")
+  TODO=$((EPS - HAVE))
+  if [ "$TODO" -le 0 ]; then
+    echo "${DATASET_PREFIX}/${NAME} already has $HAVE episodes (target $EPS) — nothing to record." >&2
+    echo "  want more? raise the target:  RESUME=1 $0 $WHICH $((HAVE + 10))" >&2
+    exit 0
+  fi
+  echo "resuming ${DATASET_PREFIX}/${NAME}: $HAVE recorded, $TODO to go (target $EPS)"
+  EPS=$TODO
+fi
 if [ "${PUSH_TO_HUB:-false}" = true ]; then
   $RUN hf auth whoami >/dev/null 2>&1 || { echo "PUSH_TO_HUB=true but not logged in — run: $RUN hf auth login" >&2; exit 1; }
 fi
 
 cat <<EOF
 
-  dataset : ${DATASET_PREFIX}/${NAME}   (${EPS} episodes, cap ${EPISODE_TIME_S}s, reset ${RESET_TIME_S}s)
+  dataset : ${DATASET_PREFIX}/${NAME}   (recording ${EPS} now, ${HAVE} already on disk; cap ${EPISODE_TIME_S}s, reset ${RESET_TIME_S}s)
   task    : "$TASK"
   target  : $TARGET
   cameras : $CAMERAS

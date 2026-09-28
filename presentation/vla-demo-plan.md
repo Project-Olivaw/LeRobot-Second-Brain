@@ -11,7 +11,7 @@ instructions, 4 minutes, act 04 of 5**:
 
 1. `agarra el Complejo B` — run it, **stay silent while it runs**.
 2. Reposition the objects.
-3. Change **only the sentence** to `agarra el frasco de magnesio`, saying it out loud while typing.
+3. Change **only the sentence** to `agarra el frasco de zinc`, saying it out loud while typing.
 4. When the arm goes to the other object — stop talking and let them applaud.
 5. Then: *"No hay un if en ninguna parte."*
 
@@ -27,7 +27,7 @@ encima" belongs to the *animated* `act-vs-vla` scene; making it real is [[2026-0
 |---|---|---|
 | `--policy.path=$HF_USER/smolvla-medicamentos` | nothing is on the Hub; the policy is a local checkpoint named `smolvla_so100_medicament_box` | push it ([[11-hub-sync]]) and align the name, or edit `slides.md:465` |
 | `--robot.type=so101_follower` (`slides.md:466`) | the arm is an **SO-100** | change to `so100_follower` — this line is run on stage |
-| two instructions | only the box dataset exists (50 eps); no magnesium bottle | record the bottle dataset ([[2026-09-medicaments-vla]]) |
+| two instructions | only the box dataset exists (50 eps); no zinc bottle | record the bottle dataset ([[2026-09-medicaments-vla]]) |
 | `agarra el Complejo B` (Spanish) | the dataset's task string is English | re-record or `modify_tasks`; the sentence you say must be the sentence it was trained on |
 | "SO-101" in 15 places (README, locales, monologue) | SO-100 | cosmetic except `slides.md:466`, but worth fixing for honesty |
 | `--device=mps` | correct for `lerobot-rollout` (`--policy.device` is the *training* flag) | the deck's own stage note already says this — it is right |

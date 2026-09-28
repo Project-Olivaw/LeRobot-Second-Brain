@@ -18,9 +18,19 @@ if [ "${1:-}" = "--jobs" ]; then
 fi
 NAME=${1:?dataset name}; STEPS=${2:-20000}; SUF=${3:-}
 JOB=smolvla_${NAME}${SUF}
+# smolvla_base was pretrained with its cameras named camera1/2/3 and lerobot >= 0.6 refuses any other
+# names, so map the dataset's keys onto them (top->camera1, wrist->camera2, base->camera3).
+# Override with RENAME_MAP='{...}'. The map is saved in the checkpoint and read back by tools/eval.sh
+# and tools/demo.sh, so nothing has to remember it later (lessons/smolvla-rename-map.md).
+INFO="${HF_LEROBOT_HOME:-$HOME/.cache/huggingface/lerobot}/${DATASET_PREFIX}/${NAME}/meta/info.json"
+if [ -z "${RENAME_MAP:-}" ] && [ -f "$INFO" ]; then
+  RENAME_MAP=$(python3 "$(dirname "$0")/rename_map.py" "$INFO") || exit 1
+fi
+[ -n "${RENAME_MAP:-}" ] && echo "rename_map: $RENAME_MAP"
 run "$RUN lerobot-train \
   --policy.path=lerobot/smolvla_base \
   --dataset.repo_id=${DATASET_PREFIX}/${NAME} \
+  ${RENAME_MAP:+--rename_map=$(q "$RENAME_MAP")} \
   --output_dir=outputs/train/${JOB} --job_name=${JOB} \
   --policy.device=$DEVICE \
   --batch_size=$BATCH_SIZE --num_workers=$NUM_WORKERS \

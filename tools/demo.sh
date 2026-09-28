@@ -14,12 +14,13 @@ if [ -f "$POLICY/train_config.json" ]; then
   MAP=$(python3 -c "import json,sys; m=json.load(open(sys.argv[1])).get('rename_map') or {}; print(json.dumps(m) if m else '')" "$POLICY/train_config.json")
   [ -n "$MAP" ] && RM="--rename_map=$(q "$MAP")"
 elif [ -n "${RENAME_MAP:-}" ]; then RM="--rename_map=$(q "$RENAME_MAP")"; fi
+POLICY_CAMERAS=$(cameras_for_policy "$POLICY") || exit 1
 INF="--inference.type=rtc"; [ "${RTC:-1}" = 0 ] && INF=""
 run "$RUN lerobot-rollout \
   --strategy.type=base $INF \
   --policy.path=$(q "$POLICY") --device=$DEVICE $RM \
   --robot.type=$ROBOT_TYPE --robot.port=$ROBOT_PORT --robot.id=$ROBOT_ID \
-  --robot.cameras=$(q "$CAMERAS") \
+  --robot.cameras=$(q "$POLICY_CAMERAS") \
   --task=$(q "$TASK") \
   --duration=$SECS \
   --display_data=true"

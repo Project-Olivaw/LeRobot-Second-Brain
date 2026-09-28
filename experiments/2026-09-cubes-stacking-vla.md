@@ -13,7 +13,7 @@ tell the story of an ACT policy that grabbed the red cube when asked for the blu
 The **live** demo (slide `demo-live`, `monologue/es.md` §demo-live) is two medicine instructions:
 
 - `agarra el Complejo B`
-- `agarra el frasco de magnesio`
+- `agarra el frasco de zinc`
 
 …with the punchline *"No hay un if en ninguna parte."* That is what
 [[2026-09-medicaments-vla]] is building, and it is the lower-risk path to the same point.
@@ -22,7 +22,7 @@ So there are two options, and they are not exclusive:
 
 | | What it proves on stage | Cost | Risk |
 |---|---|---|---|
-| **A. Medicines (as written)** | Same weights, only the sentence changes | 1 more dataset (magnesium bottle, 50 eps) | Low — half of it is already trained |
+| **A. Medicines (as written)** | Same weights, only the sentence changes | 1 more dataset (zinc bottle, 50 eps) | Low — half of it is already trained |
 | **B. Cubes + stacking (this note)** | The same, *plus* a composed two-object action | 200 episodes, ~6 h training | Medium-high — stacking is a precision task |
 
 **Recommendation: do A first** (it is the deck's actual promise and the bottle dataset is 50

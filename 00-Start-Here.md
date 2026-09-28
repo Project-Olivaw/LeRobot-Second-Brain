@@ -10,7 +10,7 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[2026-09-medicaments-vla]] — "Complejo B" box → ESP32 car. **WORKS: 80-90% success with SmolVLA**
   (the early failures were camera order, not data — [[camera-order-matters]]). Dataset + both policies
   are on the Hub under `Youngermaster/`.
-- **Next up:** [[14-two-instruction-demo]] — record the magnesium bottle (50 eps), merge, retrain.
+- **Next up:** [[14-two-instruction-demo]] — record the zinc bottle (50 eps), merge, retrain.
   That completes the talk's `demo-live` slide. Interaction is `tools/demo_live.sh` → `/subtask <frase>`.
 - [[2026-09-cubes-stacking-vla]] — planned: red/blue cubes, 4 instructions × 50 episodes, 3 cameras,
   the real version of the deck's animated "ahora el rojo, encima".
@@ -82,12 +82,15 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[lock-exposure-and-white-balance]] — `tools/lock_cameras.sh`; impossible on macOS
 - [[balance-the-instructions]] — multi-task datasets need equal, lexically distinct instructions
 - [[camera-order-matters]] — a swapped camera looks exactly like a badly trained policy
+- [[resume-needs-dataset-root]] — `--resume=true` also needs `--dataset.root`
+- [[resume-counts-this-run]] — num_episodes counts this run; Esc mid-episode saves the stub
+- [[identical-cameras-need-by-path]] — same model + same serial = one by-id name; pin the USB port
 - [[camera-indices-shift-on-replug]] — resolve by `/dev/v4l/by-id`, never a bare index
 
 ## Reference
 - [[troubleshooting]] — symptom table
 - [[timeline]] — chronological log
-- `tools/` — `env.sh`, `find.sh`, `teleop.sh`, `record.sh`, `train_act.sh`, `train_smolvla.sh`, `eval.sh`, `push_hub.sh`, `bench.py`, `eta.sh`;
+- `tools/` — `env.sh`, `find.sh`, `teleop.sh`, `record.sh`, `train_act.sh`, `train_smolvla.sh`, `eval.sh`, `push_hub.sh`, `drop_camera.sh`, `rename_map.py`, `bench.py`, `eta.sh`;
   project runners `record_medicament_box.sh`, `record_medicamentos.sh` (two-instruction halves, `--plan`), `overnight_medicament_box.sh`;
   cross-machine `pull.sh`, `push_dataset.py`, `merge_tasks.sh`, `tasks.sh`, `lock_cameras.sh`, `bench_policy.py`;
   demo `demo_live.sh` (interactive `/subtask`), `demo.sh` (one-shot);
@@ -99,6 +102,6 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 ## Resumen (ES)
 
 Índice del vault. Estado: SmolVLA de la caja de medicamento **entrenado pero sin evaluar**; falta el
-frasco de magnesio para el demo de dos instrucciones de la charla. Planeado: cubos rojo/azul con
+frasco de zinc para el demo de dos instrucciones de la charla. Planeado: cubos rojo/azul con
 apilado (4 instrucciones × 50 episodios, 3 cámaras). El bucle entre máquinas (grabar → Hub →
 entrenar → demo en la Mac) está en [[13-cross-machine-loop]].

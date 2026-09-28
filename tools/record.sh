@@ -6,12 +6,17 @@ set -e; source "$(dirname "$0")/_common.sh"
 NAME=${1:?name}; TASK=${2:?task}; EPS=${3:-50}; ET=${4:-30}; RT=${5:-10}
 case "$TASK" in *:*|*\'*) echo "task string must not contain ':' or \"'\" (lessons/single-task-no-colons.md)" >&2; exit 1;; esac
 RES=""; [ "${RESUME:-0}" = 1 ] && RES="--resume=true"
+# --dataset.root is REQUIRED by LeRobotDataset.resume() in 0.6.2 (it refuses to write into the Hub
+# snapshot cache) and is the same path lerobot picks by default, so pass it always: create and resume
+# then agree on one directory (lessons/resume-needs-dataset-root.md).
+ROOT="${HF_LEROBOT_HOME:-$HOME/.cache/huggingface/lerobot}/${DATASET_PREFIX}/${NAME}"
 run "$RUN lerobot-record \
   --robot.type=$ROBOT_TYPE --robot.port=$ROBOT_PORT --robot.id=$ROBOT_ID \
   --robot.cameras=$(q "$CAMERAS") \
   --teleop.type=$TELEOP_TYPE --teleop.port=$TELEOP_PORT --teleop.id=$TELEOP_ID \
   --display_data=true \
   --dataset.repo_id=${DATASET_PREFIX}/${NAME} \
+  --dataset.root=$(q "$ROOT") \
   --dataset.single_task=$(q "$TASK") \
   --dataset.num_episodes=$EPS --dataset.episode_time_s=$ET --dataset.reset_time_s=$RT \
   --dataset.push_to_hub=$PUSH_TO_HUB --dataset.no_stamp=true $RES"

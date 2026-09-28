@@ -19,10 +19,12 @@ if [ -f "$POLICY/train_config.json" ]; then   # the policy knows its own map; ig
   RENAME_MAP=$(python3 -c "import json,sys; m=json.load(open(sys.argv[1])).get('rename_map') or {}; print(json.dumps(m) if m else '')" "$POLICY/train_config.json")
 fi
 RM=""; [ -n "${RENAME_MAP:-}" ] && RM="--rename_map=$(q "$RENAME_MAP")"
+need_cameras
+POLICY_CAMERAS=$(cameras_for_policy "$POLICY") || exit 1   # only the cameras this policy was trained on
 INF=""; [ "${RTC:-0}" = 1 ] && INF="--inference.type=rtc"
 COMMON="$RUN lerobot-rollout \
   --robot.type=$ROBOT_TYPE --robot.port=$ROBOT_PORT --robot.id=$ROBOT_ID \
-  --robot.cameras=$(q "$CAMERAS") \
+  --robot.cameras=$(q "$POLICY_CAMERAS") \
   --policy.path=$POLICY --policy.device=$DEVICE $RM $INF \
   --display_data=true"
 if [ "$EPS" = 0 ]; then

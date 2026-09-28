@@ -1,6 +1,6 @@
 # 2026-09 — Medicament boxes / bottles — SmolVLA (recording)
 
-**Status:** **WORKS — 80-90% success with SmolVLA** (2026-09, several evaluation sessions). Dataset and both policies are on the Hub. Next: the second instruction (magnesium bottle) so the talk's two-sentence demo exists — [[14-two-instruction-demo]].
+**Status:** **WORKS — 80-90% success with SmolVLA** (2026-09, several evaluation sessions). Dataset and both policies are on the Hub. Next: the second instruction (zinc bottle) so the talk's two-sentence demo exists — [[14-two-instruction-demo]].
 **Machine:** record on **desktop** (already set up), train on **desktop** overnight (HF Jobs as backup), demo on **macbook**
 **lerobot version:** **0.6.2 @ `8c894413c`** on both machines (desktop `uv run`, verified 2026-09-13 22:15; Mac venv) — see "Version alignment" below
 
@@ -167,7 +167,7 @@ Pull them anywhere with `tools/pull.sh dataset|policy <name>` ([[13-cross-machin
 ## Next for the talk
 
 The deck's live demo needs **two** instructions ([[vla-demo-plan]]). Only the box exists. To finish it:
-record `so100_medicament_bottle` (50 eps, `agarra el frasco de magnesio`, magnesium bottle, same
+record `so100_medicament_bottle` (50 eps, `agarra el frasco de zinc`, zinc bottle, same
 scene, box present as distractor), merge with `tools/merge_tasks.sh`, retrain. The cube version of
 the same idea is [[2026-09-cubes-stacking-vla]].
 
