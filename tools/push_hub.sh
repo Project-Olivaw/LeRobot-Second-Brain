@@ -2,7 +2,7 @@
 # Usage: tools/push_hub.sh dataset <local_name> [private=true]
 #        tools/push_hub.sh policy  <job_name> [checkpoint=last]
 # Explicit uploads only. Requires HF_USER. DRY=1 to print only.
-set -e; source "$(dirname "$0")/_common.sh"
+set -e; source "$(dirname "$0")/_common.sh"; cd "$LEROBOT_DIR"   # `uv run` resolves the project from the cwd
 [ -n "$HF_USER" ] || { echo "HF_USER is empty — see lessons/hf-whoami-format.md" >&2; exit 1; }
 case "${1:-}" in
   dataset)

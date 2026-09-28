@@ -43,6 +43,8 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 10. [[10-evaluate]]
 11. [[11-hub-sync]]
 12. [[12-recording-keys]]
+13. [[14-two-instruction-demo]] — the demo, end to end (the *why*)
+14. **[[15-runbook-copy-paste]] — every command, every phase, ready to paste (the *how*)**
 13. [[13-cross-machine-loop]]
 14. [[14-two-instruction-demo]]
 
