@@ -42,7 +42,11 @@ def main() -> None:
     cfg = PreTrainedConfig.from_pretrained(path)
     cfg.device = device
     policy = get_policy_class(cfg.type).from_pretrained(path, config=cfg).to(device).eval()
-    preprocessor, _ = make_pre_post_processors(cfg, pretrained_path=path)
+    # The saved processor carries the device it was TRAINED on, so it would move inputs to cuda
+    # while the model sits on cpu/mps. lerobot_rollout overrides it the same way (rollout/context.py).
+    preprocessor, _ = make_pre_post_processors(
+        cfg, pretrained_path=path, preprocessor_overrides={"device_processor": {"device": device}}
+    )
 
     # Hub ids are cached locally by from_pretrained; read the same config.json for the feature list.
     meta_path = Path(path) / "config.json"

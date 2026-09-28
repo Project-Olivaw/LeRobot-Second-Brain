@@ -10,6 +10,10 @@ Measured on the desktop (RTX 5060 Ti) with `tools/bench_policy.py`, 2026-09-27:
 |---|---|---|---|---|---|
 | `smolvla_so100_medicament_box` | 3 | 50 | **152 ms** | 1.6 ms | 1.7 s |
 | `act_so100_medicament_box` | 2 | 100 | **10 ms** | 0.3 ms | 3.3 s |
+| the same SmolVLA on **CPU** | 3 | 50 | **924 ms** | 1.5 ms | 1.7 s |
+
+CPU is the pessimistic bound for the MacBook: a 0.93 s freeze every 1.7 s, i.e. ~28 stalled control
+steps. `mps` should land between the two — measure it, do not assume.
 
 So SmolVLA stalls ~5 control steps every 1.7 s even on the GPU. That is small but visible, and
 `mps` on the MacBook is expected to be several times slower — measure it there before the talk:
