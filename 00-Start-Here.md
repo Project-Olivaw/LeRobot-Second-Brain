@@ -89,6 +89,7 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[resume-counts-this-run]] — num_episodes counts this run; Esc mid-episode saves the stub
 - [[macos-builtin-camera-steals-a-slot]] — a missing USB camera on macOS is replaced, not reported
 - [[identical-cameras-need-by-path]] — same model + same serial = one by-id name; pin the USB port
+- [[stale-exports-survive-a-resource]] — a new terminal is the only guaranteed clean slate
 - [[camera-indices-shift-on-replug]] — resolve by `/dev/v4l/by-id`, never a bare index
 
 ## Reference

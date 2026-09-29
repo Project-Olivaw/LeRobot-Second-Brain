@@ -7,6 +7,12 @@ _here="$(dirname "$(readlink -f "${BASH_SOURCE[0]:-$0}")")"
 _env="$_here/../machines/$_name.env"
 if [ ! -f "$_env" ]; then echo "no profile: $_env" >&2; return 1 2>/dev/null || exit 1; fi
 export VAULT_DIR="$(readlink -f "$_here/..")"
+# Clear every variable the profiles own BEFORE sourcing. Re-sourcing cannot unset a variable the
+# new profile no longer sets, so without this a stale CAM_TOP_PATH from an earlier source survives
+# a profile edit and two keys can resolve to the same device (2026-09-29: top=2 wrist=2 ->
+# "Failed to open OpenCVCamera(2)"). See lessons/stale-exports-survive-a-resource.md.
+unset $(set | sed -n 's/^\(CAM_[A-Z0-9_]*\)=.*/\1/p') 2>/dev/null
+unset CAMERAS CAMERAS_TWO CAMERAS_THREE CAMERAS_TOP_ONLY CAM_KEYS DEMO_POLICY DEMO_TASK1 DEMO_TASK2 2>/dev/null
 # shellcheck disable=SC1090
 source "$_env"
 # Linux: resolve cameras by stable id -> index (tools/cameras.sh). macOS profiles keep static blocks.

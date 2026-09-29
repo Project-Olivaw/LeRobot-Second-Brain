@@ -33,7 +33,7 @@ _cam_block() {     # $1 = key, $2 = index
 }
 _cam_join() { local out="" b; for b in "$@"; do out="${out:+$out, }$b"; done; echo "$out"; }
 
-_cam_all=(); _cam_keys=""; _cam_msg=""
+_cam_all=(); _cam_keys=""; _cam_msg=""; _cam_idxs=""
 # Keys to look for: the three fixed mounts, plus any CAM_EXTRA<N>_{PATH,ID,INDEX} in the environment.
 # Fed through a here-doc and `read`: zsh does not word-split an unquoted $var the way bash does, and
 # a pipe would run the loop in a subshell where the exports would be lost.
@@ -47,6 +47,7 @@ while IFS= read -r _K; do
   if [ -n "$_i" ]; then
     _b=$(_cam_block "$_k" "$_i"); eval "export CAM_${_K}=\"\$_b\""
     _cam_all+=("$_b"); _cam_keys="${_cam_keys:+$_cam_keys }$_k"; _cam_msg="$_cam_msg $_k=$_i"
+    _cam_idxs="${_cam_idxs:+$_cam_idxs }$_i"
   else
     unset "CAM_${_K}"; _cam_msg="$_cam_msg $_k=MISSING"
   fi
@@ -63,6 +64,18 @@ export CAM_KEYS="$_cam_keys"
 # CAMERAS = everything that answered, so an extra camera is picked up without editing a script.
 if [ ${#_cam_all[@]} -gt 0 ]; then export CAMERAS="{ $(_cam_join "${_cam_all[@]}") }"; else unset CAMERAS; fi
 
+# Two keys resolving to the SAME /dev/videoN is always a configuration error: the first camera
+# connects and the second fails with OpenCV's opaque "Failed to open OpenCVCamera(N)". Catch it here.
+_cam_dupes=$(printf '%s\n' $_cam_idxs | sort | uniq -d | tr '\n' ' ')
+if [ -n "${_cam_dupes// /}" ]; then
+  unset CAMERAS
+  echo "cameras: TWO KEYS ON THE SAME DEVICE (index ${_cam_dupes% }) — found:${_cam_msg:-none}" >&2
+  echo "  a CAM_*_PATH/_ID in machines/$MACHINE.env points at a device another key already claims," >&2
+  echo "  or a stale CAM_* export from an earlier source survived. Fix: open a new terminal, or" >&2
+  echo "  unset the stale variable, then re-source. See lessons/stale-exports-survive-a-resource.md" >&2
+  _cam_bad=1
+fi
+
 # Required keys must all be present, or CAMERAS is withdrawn (need_cameras() then refuses to run).
 _cam_lack=""
 while IFS= read -r _r; do
@@ -76,7 +89,7 @@ if [ -n "$_cam_lack" ]; then
   echo "cameras: MISSING REQUIRED [$_cam_lack] — found:${_cam_msg:-none}" >&2
   echo "  plug them in, then re-source. Identify ports with: ls -l /dev/v4l/by-path/" >&2
   echo "  recording with fewer on purpose? CAM_REQUIRED=\"top wrist\" source tools/env.sh $MACHINE" >&2
-else
+elif [ -z "${_cam_bad:-}" ]; then
   echo "cameras:$_cam_msg  (keys: $CAM_KEYS)"
 fi
-unset _cam_all _cam_keys _cam_missing _cam_msg _cam_candidates _cam_lack _K _k _i _b _alias _r
+unset _cam_all _cam_keys _cam_missing _cam_msg _cam_candidates _cam_lack _cam_idxs _cam_dupes _cam_bad _K _k _i _b _alias _r
