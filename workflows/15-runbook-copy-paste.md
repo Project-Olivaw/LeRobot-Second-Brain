@@ -99,7 +99,7 @@ tools/train_smolvla.sh so100_medicamentos 40000
 ```
 
 The `--rename_map` (top/wrist/base → camera1/2/3) is derived from the dataset and saved into the
-checkpoint, so nothing downstream has to remember it ([[smolvla-rename-map]]).
+checkpoint, so nothing downstream has to remember it ([[smolvla-camera-slots]]).
 
 In another terminal, two minutes in:
 
@@ -220,7 +220,7 @@ moved in its mount explains more failures than the model does ([[scene-kit]],
 |---|---|
 | `resume() requires an explicit 'root'` | already handled by `tools/record.sh` — [[resume-needs-dataset-root]] |
 | A camera reads `MISSING` although it is plugged in | pin the USB port — [[identical-cameras-need-by-path]] |
-| `Feature mismatch … Missing features: camera1/2/3` | the rename map — [[smolvla-rename-map]] |
+| `Feature mismatch … Missing features: camera1/2/3` | the rename map — [[smolvla-camera-slots]] |
 | Resume overshoots the target | pass the target, not the remainder — [[resume-counts-this-run]] |
 | Anything else | [[troubleshooting]] |
 

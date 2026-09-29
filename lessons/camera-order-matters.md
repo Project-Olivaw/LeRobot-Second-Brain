@@ -20,6 +20,15 @@ almost right. Indistinguishable from "we need more data" — which is exactly th
 order and change after a reboot or replug ([[camera-indices-shift-on-replug]]). The dataset stores
 the *keys*, not the devices ([[camera-keys-are-baked-in]]), so a swap is invisible to every tool.
 
+**It happened again on 2026-09-29**, and this time it was caught before it cost anything. After
+reconnecting the desk, `machines/desktop.env` pinned `top` to USB port 7 and `wrist` to port 1, but
+port 7 held an Innomaker (the gripper camera) and port 1 held the WENKIA (the overhead camera) — the
+two keys were swapped. Proof: a frame decoded from the recorded dataset's `top` video is the
+overhead view, and the live camera the profile called `top` showed the gripper jaws.
+
+That comparison is now a tool: **`tools/verify_cameras.py <dataset>`** ([[16-verify-the-rig]]).
+Run it after every replug, on either machine, before recording or evaluating.
+
 Defences, in order:
 
 1. **Resolve by stable id, never by bare index.** `machines/desktop.env` names cameras by their
@@ -28,7 +37,9 @@ Defences, in order:
    check the probe images every session there ([[macbook-m3]]).
 2. **Look at the pictures before recording or evaluating.** `lerobot-find-cameras` writes one frame
    per camera to `outputs/captured_images/`; 10 seconds of looking beats an hour of doubting the data.
-3. **When a policy underperforms, rule the cameras out first** — it is cheaper than recording more
+3. **Compare against the dataset, not against memory** — `tools/verify_cameras.py` scores live
+   frames against the recorded ones and exits non-zero on a swap.
+4. **When a policy underperforms, rule the cameras out first** — it is cheaper than recording more
    episodes, and this time it was the whole problem.
 
 Related: [[cameras]], [[10-evaluate]], [[2026-09-medicaments-vla]].

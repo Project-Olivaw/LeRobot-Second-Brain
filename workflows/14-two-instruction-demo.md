@@ -152,7 +152,7 @@ tools/train_smolvla.sh so100_medicamentos 40000
 ```
 
 The `--rename_map` (top/wrist/base → camera1/2/3) is derived from the dataset by the wrapper and
-saved into the checkpoint — nothing downstream has to know it ([[smolvla-rename-map]]).
+saved into the checkpoint — nothing downstream has to know it ([[smolvla-camera-slots]]).
 
 Measured reference from the single-task box run: **30k steps = 1 h 41 at 0.21 s/step, batch 8, 3 GB
 VRAM with two cameras**. With 200 episodes, two instructions and three cameras, budget **40k steps

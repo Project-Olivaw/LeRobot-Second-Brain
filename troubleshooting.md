@@ -42,7 +42,7 @@
 | Policy works at home, fails at the venue | light/background changed; auto-exposure shifted | bring the scene kit, lock the cameras — [[scene-kit]], [[lock-exposure-and-white-balance]] |
 | macOS probe finds only the FaceTime camera and/or a black frame | terminal lacks camera permission; Continuity Camera holds an index; unpowered hub | `tools/mac_cameras.sh` — [[macbook-m3]] |
 | `lerobot-find-port` only gives one arm | it detects one bus per run, by design | run it twice — `tools/find_ports.sh` |
-| Policy hesitates / reaches slightly wrong, "needs more data" | camera order swapped since training | [[camera-order-matters]] |
+| Policy hesitates / reaches slightly wrong, "needs more data" | camera order swapped since training | `tools/verify_cameras.py <dataset>` — [[camera-order-matters]], [[16-verify-the-rig]] |
 | `403 ... rights to create a dataset under the namespace "local"` | `push_to_hub()` uses the dataset's own repo_id | re-point it first — `tools/push_dataset.py` / [[11-hub-sync]] |
 | Multi-task policy ignores the instruction | instructions imbalanced or too similar, or the scene gives the answer away | [[balance-the-instructions]] |
 

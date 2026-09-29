@@ -45,6 +45,7 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 12. [[12-recording-keys]]
 13. [[14-two-instruction-demo]] — the demo, end to end (the *why*)
 14. **[[15-runbook-copy-paste]] — every command, every phase, ready to paste (the *how*)**
+15. **[[16-verify-the-rig]] — the 2-minute check after plugging in, on either machine**
 13. [[13-cross-machine-loop]]
 14. [[14-two-instruction-demo]]
 
@@ -83,7 +84,7 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[smolvla-camera-slots]] — camera1/2/3 and the `--rename_map`; the third slot is free
 - [[lock-exposure-and-white-balance]] — `tools/lock_cameras.sh`; impossible on macOS
 - [[balance-the-instructions]] — multi-task datasets need equal, lexically distinct instructions
-- [[camera-order-matters]] — a swapped camera looks exactly like a badly trained policy
+- [[camera-order-matters]] — a swapped camera looks exactly like a badly trained policy (caught again 2026-09-29)
 - [[resume-needs-dataset-root]] — `--resume=true` also needs `--dataset.root`
 - [[resume-counts-this-run]] — num_episodes counts this run; Esc mid-episode saves the stub
 - [[macos-builtin-camera-steals-a-slot]] — a missing USB camera on macOS is replaced, not reported
@@ -98,7 +99,8 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
   cross-machine `pull.sh`, `push_dataset.py`, `merge_tasks.sh`, `tasks.sh`, `lock_cameras.sh`, `bench_policy.py`;
   demo `demo_live.sh` (interactive `/subtask`), `demo.sh` (one-shot);
   setup `find_ports.sh` (both arms), `identify_arms.py` (which port is which, read-only),
-  `mac_cameras.sh` (macOS diagnosis), `check_cameras.py` (pre-flight before a long session)
+  `mac_cameras.sh` (macOS diagnosis), `check_cameras.py` (pre-flight before a long session),
+  `verify_cameras.py` (live feeds vs the recorded dataset — run after every replug)
 - `archive/` — [[SO100_PICK_AND_PLACE_GUIDE]], [[SO100_FOOLS_MATE_GUIDE]], [[vla-roadmap-2026-08]], [[reading-list]]
 - [[vla-demo-plan]] — presentation
 
