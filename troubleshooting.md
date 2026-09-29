@@ -4,6 +4,7 @@
 |---|---|---|
 | `failed to set fps=30 (actual_fps=20.0)` | camera in raw YUYV mode | add `fourcc: MJPG` — [[mjpg-required-for-30fps]] |
 | `failed to set capture_width=640 (actual_width=1920)` / `failed to set fourcc=MJPG` | opened by `/dev/videoN` string → FFMPEG backend | use integer index — [[integer-index-not-dev-path]] |
+| macOS shows three feeds but one is the laptop's own camera | a USB camera did not enumerate; AVFoundation indices shifted | `check_cameras.py` (reference check) — [[macos-builtin-camera-steals-a-slot]] |
 | A camera reports `absent` / only two feeds although three are plugged in | two cameras of the same model share one `/dev/v4l/by-id` name | pin the USB port with `CAM_*_PATH` — [[identical-cameras-need-by-path]] |
 | A camera fails only when all three are attached | USB bandwidth / power | [[usb-bandwidth-three-cams]] |
 | Wrong camera under a key (wrist/base swapped) | indices shifted | re-probe and look at the PNGs — [[04-find-cameras]] |

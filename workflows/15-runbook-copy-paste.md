@@ -21,13 +21,25 @@ cd ~/GitHub/AnotherOnes/LeRobot-Second-Brain && source tools/env.sh desktop   # 
 
 ```bash
 tools/lock_cameras.sh                    # fix exposure/white balance (Linux only)
-uv run python tools/check_cameras.py     # one PNG per key: top / wrist / base
+uv run python tools/check_cameras.py     # one PNG per key + compares each view to its reference
 tools/teleop.sh                          # three live feeds, leader drives follower, no offset
 ```
 
-`check_cameras.py` matters because the wrist and base cameras are the same model with the same
-serial: only the PNGs prove the ports are assigned correctly. Swapped? Exchange the two `CAM_*_PATH`
-lines in `machines/desktop.env`.
+`check_cameras.py` is the gate, not a formality. It catches the failure a black-frame test cannot:
+a camera that opens fine but is **the wrong one** — the wrist and base cameras are the same model with
+the same serial, and on macOS a USB camera that fails to enumerate is silently replaced by the
+built-in one ([[macos-builtin-camera-steals-a-slot]]).
+
+Once per machine, with the scene built the way you recorded it:
+
+```bash
+uv run python tools/check_cameras.py --save-reference    # writes assets/camera-reference/*.png
+```
+
+Every later run scores each feed against those references: **≥0.65 pass, <0.65 warn, <0.35 fail**
+(measured: same camera 0.99, swapped cameras ≤0.25, a different scene 0.01). Views swapped on Linux?
+Exchange the two `CAM_*_PATH` lines in `machines/desktop.env`. On macOS, re-run `tools/mac_cameras.sh`
+and fix the indices.
 
 ## Phase 1 — Record (2 halves × 100 episodes)
 
@@ -109,7 +121,19 @@ tools/eval.sh so100_medicamentos $POLICY 10       # 10 scored episodes, saved as
 ```
 
 The number that matters is **"asked for the bottle, went to the bottle"** — score each instruction
-separately, 10 episodes each, objects swapped left/right half the time.
+separately, 10 episodes each, objects swapped left/right half the time. Write the counts into
+[[2026-09-medicaments-vla]] as you go; a remembered score is not a result:
+
+| Instruction | Objects | Went to the right object | Grasped it | Placed it on the board |
+|---|---|---|---|---|
+| `agarra el frasco de zinc` | bottle LEFT | /5 | /5 | /5 |
+| `agarra el frasco de zinc` | bottle RIGHT | /5 | /5 | /5 |
+| `agarra la caja de Complejo B` | box LEFT | /5 | /5 | /5 |
+| `agarra la caja de Complejo B` | box RIGHT | /5 | /5 | /5 |
+
+Three columns because they fail for different reasons: *wrong object* is a language problem (the data
+was not balanced enough), *right object but no grasp* is a manipulation problem (more or cleaner
+demonstrations), *grasped but not placed* is usually the episode cap or an occluded wrist view.
 
 Rehearse the stage flow itself:
 
@@ -124,8 +148,17 @@ tools/demo_live.sh "agarra la caja de Complejo B"
 
 ```bash
 tools/push_hub.sh dataset so100_medicamentos          # private by default
-tools/push_hub.sh policy  smolvla_so100_medicamentos
+tools/push_hub.sh policy  smolvla_so100_medicamentos  # private by default
 ```
+
+Done 2026-09-28, both **private**:
+- dataset → `Youngermaster/so100_medicamentos` (200 episodes, 125,517 frames, 4.2 GB)
+- policy  → `Youngermaster/smolvla_so100_medicamentos` (40k steps, loss 0.058, 869 MB)
+
+The checkpoint carries `train_config.json`, so its camera map (top/wrist/base → camera1/2/3) travels
+with it and the Mac needs no flags. To make either public for the talk:
+`hf repo settings <user>/<name> --public` — and note that an accidental public release cannot be
+taken back, which is why both default to private.
 
 ## Phase 6 — The MacBook (the rehearsal that counts)
 
@@ -136,6 +169,17 @@ tools/pull.sh policy smolvla_so100_medicamentos # BEFORE leaving wifi — it is 
 uv run python tools/check_cameras.py            # three cameras; indices shift on macOS
 uv run python tools/bench_policy.py "$DEMO_POLICY" mps    # inference rate; < 10 Hz -> RTC
 tools/demo_live.sh
+```
+
+**Count the feeds AND look at them.** Observed 2026-09-28 with two hubs: three cameras came up, but
+they were the *built-in* camera, wrist and base — the USB overhead camera had not enumerated and the
+indices shifted under it. `check_cameras.py` now fails on that
+([[macos-builtin-camera-steals-a-slot]]). Plug the cameras in one at a time, then:
+
+```bash
+tools/mac_cameras.sh                     # which AVFoundation index is which, with PNGs
+# fix CAM_TOP/CAM_WRIST/CAM_BASE indices in machines/macbook.env, then:
+uv run python tools/check_cameras.py     # must pass all three against the references
 ```
 
 Mac traps, all of them avoidable: Continuity Camera steals an AVFoundation index (turn it off),
