@@ -104,6 +104,7 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
   demo `demo_live.sh` (interactive `/subtask`), `demo.sh` (one-shot);
   setup `find_ports.sh` (both arms), `identify_arms.py` (which port is which, read-only),
   `mac_cameras.sh` (macOS diagnosis), `check_cameras.py` (pre-flight before a long session),
+  `aim_cameras.py` (live score while you re-aim a moved camera), `verify_cameras.py` (score against the dataset),
   `verify_cameras.py` (live feeds vs the recorded dataset — run after every replug)
 - `archive/` — [[SO100_PICK_AND_PLACE_GUIDE]], [[SO100_FOOLS_MATE_GUIDE]], [[vla-roadmap-2026-08]], [[reading-list]]
 - [[vla-demo-plan]] — presentation
