@@ -1,6 +1,11 @@
 # 2026-09 — Medicament boxes / bottles — SmolVLA (recording)
 
-**Status:** **WORKS — 80-90% success with SmolVLA** (2026-09, several evaluation sessions). Dataset and both policies are on the Hub. Next: the second instruction (zinc bottle) so the talk's two-sentence demo exists — [[14-two-instruction-demo]].
+**Status:** **`smolvla_so100_medicament_box` (one instruction, one object): WORKS — 80-90%** on the
+desktop, several sessions. **`smolvla_so100_medicamentos` (two instructions, two objects in frame):
+trained 40k steps and published, but NEVER EVALUATED on any machine** — Step 4 of
+[[14-two-instruction-demo]] was skipped. It missed most grasps on the MacBook on 2026-09-29; there is
+no desktop number to compare that against, so the first job is to evaluate it on the desktop
+([[the-85-percent-was-a-different-policy]]).
 **Machine:** record on **desktop** (already set up), train on **desktop** overnight (HF Jobs as backup), demo on **macbook**
 **lerobot version:** **0.6.2 @ `8c894413c`** on both machines (desktop `uv run`, verified 2026-09-13 22:15; Mac venv) — see "Version alignment" below
 
@@ -153,6 +158,32 @@ not the model.
 
 Not recorded yet (worth doing if you evaluate again): success counts per checkpoint, ACT vs SmolVLA
 side by side, and behaviour at unseen spawn positions.
+
+### 2026-09-29 — the two-instruction policy on the MacBook: mostly misses
+
+First time `smolvla_so100_medicamentos` touched a robot. Wiring was verified first, so this is not
+[[camera-order-matters]] again: arms identified 6/6 ([[identify-arms-by-homing-offset]]), camera keys
+confirmed against the recorded videos, `--rename_map` reaching the rollout
+([[hub-id-is-not-a-directory]]). Three candidate causes, in the order they should be tested:
+
+1. **The policy itself has never been measured.** The 80-90% was the single-instruction box policy on
+   an easier task ([[the-85-percent-was-a-different-policy]]). **Evaluate `smolvla_so100_medicamentos`
+   on the desktop** — that single number decides whether anything below matters.
+2. **Inference is 5x slower on `mps`, and RTC turns that into stale vision.** Measured with
+   `tools/bench_policy.py`: 781 ms per recompute vs **152 ms** on the 5060 Ti. RTC recomputes when the
+   queue falls to 30 actions (1.0 s of buffer) and conditions on `ceil(latency / 33 ms)` steps of
+   delay: **24 steps (0.78 s) on the Mac vs 5 (0.15 s) on the desktop**. The arm therefore closes the
+   gripper on vision that is three quarters of a second old — which damages the *grasp*, exactly the
+   reported symptom, while the reach still looks sensible. Half precision does not help: `float16` on
+   `mps` dies inside Metal (`Destination NDArray and Accumulator NDArray cannot have different
+   datatype in MPSNDArrayMatrixMultiplication`).
+3. **The scene is out of distribution.** Live feeds were at **44-64% of the recorded brightness**
+   (top 91 vs 180, base 67 vs 152) and the `base` framing differs from the recorded view; macOS cannot
+   lock exposure or white balance ([[lock-exposure-and-white-balance]]).
+
+If (1) is fine and (2) is the blocker, the fix that keeps SmolVLA and the Mac is **remote inference**:
+`src/lerobot/async_inference/policy_server.py` on the desktop, `robot_client.py` on the Mac
+(`--extra async`, grpc). It restores 152 ms inference at the cost of a network dependency on stage.
 
 ## On the Hub (pushed 2026-09-27, private)
 
