@@ -4,14 +4,19 @@ Purpose: take the arms and cameras anywhere (the talk, another room), **record d
 them to the Hub**, run **inference** with a policy pulled from the Hub. Training happens on
 [[hf-cloud-gpu]] or the desktop, not here (no CUDA; `mps` works for ACT inference and light training only).
 
-Status (2026-09-27): venv installed at `~/GitHub/AnotherOnes/lerobot` (0.6.2-dev `8c894413c`, torch 2.11,
-`mps` available, `hf` CLI 1.30 inside the venv), calibration copied. **Blocked on cameras** — the first
-probe saw only the built-in FaceTime camera plus one black feed, none of the three USB cameras
-(step 4 below is the fix). Still `TODO`: ports (`tools/find_ports.sh`), camera indices, Accessibility
-permission, `uv run hf auth login`, first teleop.
+Status (2026-09-29): venv installed at `~/GitHub/AnotherOnes/lerobot` (0.6.2-dev `8c894413c`, torch 2.11,
+`mps` available, `hf` CLI inside the venv), calibration copied. **Arms configured and verified** —
+ports in `machines/macbook.env`, confirmed read-only with `tools/identify_arms.py` (6/6 both).
+**Cameras configured**: all three USB cameras enumerate; the keys were swapped on the first try and
+are now `top=2, wrist=1, base=0`, confirmed by content. Still `TODO`: turn off Continuity Camera
+(see below), `uv run hf auth login`, Accessibility permission, first teleop, `mps` inference bench.
 
-The policy and dataset it needs are already on the Hub:
-`tools/pull.sh policy smolvla_so100_medicament_box`.
+The policy and dataset for the talk are on the Hub (pull both **before** leaving wifi):
+
+```bash
+tools/pull.sh policy  smolvla_so100_medicamentos     # ~869 MB, two instructions, three cameras
+tools/pull.sh dataset so100_medicamentos             # needed for verify_cameras.py and the replay fallback
+```
 Everything below is what changes versus [[desktop-ubuntu]]; the workflows are otherwise identical.
 
 ## First-time setup checklist
@@ -52,8 +57,11 @@ Everything below is what changes versus [[desktop-ubuntu]]; the workflows are ot
    of permission-denied plus index 0 being the internal camera. Work through, in order:
 
    a. Grant camera permission to the terminal, quit and reopen it.
-   b. Turn off **Continuity Camera** (iPhone → Settings → General → AirPlay & Continuity), which
-      otherwise occupies an index.
+   b. Turn off **Continuity Camera** (iPhone → Settings → General → AirPlay & Continuity). It does
+      not merely occupy an index: referencing it **hangs the run** with
+      `TimeoutError: Timed out waiting for frame from camera OpenCVCamera(N)` — it opens and never
+      streams. This is what killed the first teleop attempt on 2026-09-29, and it is *not* a
+      permissions problem ([[iphone-continuity-camera-breaks-runs]]). No airplane mode needed.
    c. Use a **powered** USB-C hub. Three UVC cameras plus two arms exceed what MacBook ports supply,
       and an under-powered camera enumerates as nothing or as black frames.
    d. Plug the cameras in **one at a time**, waiting for each to appear in `system_profiler`. Some
@@ -61,11 +69,18 @@ Everything below is what changes versus [[desktop-ubuntu]]; the workflows are ot
       three in sequence succeed.
    e. Swap cables — thin/long USB cables are often charge-only or too lossy for 480 Mbit/s.
 
-   Then map indices to keys with `uv run lerobot-find-cameras opencv` and the saved PNGs in
-   `outputs/captured_images/`, and write them into `machines/macbook.env`. **Keep `top` / `wrist` /
-   `base` pointing at the same physical cameras as the desktop** — a swap silently ruins inference
-   ([[camera-order-matters]]). macOS has no `/dev/v4l/by-id` equivalent, so re-check the images
-   every session.
+   Then map indices to keys with `tools/mac_cameras.sh` (one PNG per index) and write them into
+   `machines/macbook.env`. **Keep `top` / `wrist` / `base` pointing at the same physical cameras as
+   the desktop** — a swap silently ruins inference ([[camera-order-matters]]); it happened here on
+   2026-09-29 and the probe images caught it. Do not try to pin macOS cameras by their stable
+   `uniqueID`: OpenCV's index order is not AVFoundation's, so the id cannot be translated to an
+   index ([[camera-indices-shift-on-replug]]). Verify by **content** instead, every session:
+
+   ```bash
+   uv run python tools/check_cameras.py                  # live + scores against saved references
+   uv run python tools/check_cameras.py --save-reference # freeze today's views (once, correct scene)
+   uv run python tools/verify_cameras.py so100_medicamentos   # score against the RECORDED videos
+   ```
 
 
 5. `hf auth login` and set `HF_USER` (see [[hf-whoami-format]]); recording on the Mac should push to

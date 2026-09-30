@@ -25,8 +25,18 @@ Two caveats:
 
 - Identical camera models with no unique serial get by-id names that differ only by a bus path —
   they are stable per *port*, so keep each camera in the same physical socket.
-- **macOS has no `by-id` equivalent.** Indices there are AVFoundation integers; the only defence is
-  to look at the probe images every session ([[macbook-m3]], `tools/mac_cameras.sh`).
+- **macOS has no usable `by-id` equivalent — and the obvious workaround does not work.** macOS does
+  expose a stable per-port id (`system_profiler SPCameraDataType -json` -> `spcamera_unique-id`, e.g.
+  `0x11300000c456366`; the same value is `AVCaptureDevice.uniqueID`). It is tempting to resolve it to
+  an index the way `tools/cameras.sh` does on Linux. **It cannot be done:** OpenCV's AVFoundation
+  index order is not the order AVFoundation itself reports. Measured on 2026-09-29 with five devices
+  attached — AVFoundation listed `FaceTime, WENKIA, Innomaker, Innomaker, iPhone` while OpenCV's
+  indices 0/1/2 were `base, wrist, top` (the three USB cameras) with the phone and FaceTime last.
+  So on macOS the defence is **content**, not identity: `tools/check_cameras.py --save-reference`
+  freezes today's views and every later run scores against them, and
+  `tools/verify_cameras.py <dataset>` scores the live feeds against the *recorded* videos, which is
+  the real ground truth ([[camera-order-matters]]). Also remove the phone from the list entirely —
+  [[iphone-continuity-camera-breaks-runs]].
 
 Related: [[cameras]], [[04-find-cameras]], [[camera-keys-are-baked-in]].
 

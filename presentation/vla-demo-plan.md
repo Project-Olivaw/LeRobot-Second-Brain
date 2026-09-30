@@ -48,8 +48,23 @@ optional: a new table breaks the policy ([[policy-does-not-survive-a-new-table]]
 Pre-flight (**a week before** for the `mps` dry run; the rest the day before, on Wi-Fi):
 - [ ] Desktop and Mac on the same lerobot commit (experiment note records it).
 - [ ] `machines/macbook.env` filled and committed (ports, camera indices).
+- [ ] Arms identified, not assumed: `uv run python tools/identify_arms.py` prints FOLLOWER/LEADER
+      6/6 ([[identify-arms-by-homing-offset]]).
+- [ ] **Continuity Camera off on the iPhone.** It steals an index and hangs the run with a
+      `TimeoutError` ([[iphone-continuity-camera-breaks-runs]]). This killed the first Mac teleop.
+- [ ] Cameras verified **by content, not by index**: `uv run python tools/check_cameras.py` — `top`
+      and `base` must match their references in `assets/camera-reference/`; then
+      `uv run python tools/verify_cameras.py so100_medicamentos`, where every recorded key must
+      best-match itself ([[camera-order-matters]]). The wrist has no reference on purpose — its view
+      follows the arm pose, so a single frame proves nothing.
+- [ ] **Light up to the recorded brightness.** Measured 2026-09-29: the Mac's feeds were 44-64% of
+      the dataset's (top 91 vs 180, base 67 vs 152). The policy keys off pixels, so this is the most
+      likely cause of a demo that works at home and misses on stage.
 - [ ] Calibration JSONs copied; `tools/teleop.sh` shows no offset.
-- [ ] Policy pulled: `uv run hf download ${HF_USER}/<policy>`; dataset for replay pulled.
+- [ ] Policy **and its VLM backbone** pulled. SmolVLA loads `HuggingFaceTB/SmolVLM2-500M-Video-Instruct`
+      from the Hub at construction time — it is a *separate* download from the policy, so pulling only
+      the policy still leaves the demo dead offline. Loading the policy once on Wi-Fi caches both.
+      Dataset pulled too, for the `lerobot-replay` fallback and `verify_cameras.py`.
 - [ ] `uv run python tools/bench_policy.py "$DEMO_POLICY" mps` — the recompute must stay well under
       the chunk duration, or the arm stutters ([[policy-inference-is-bursty]]). On the 5060 Ti it is
       152 ms per chunk; if the Mac is over ~1.5 s, demo the ACT policy instead.

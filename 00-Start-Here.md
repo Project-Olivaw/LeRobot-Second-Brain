@@ -79,6 +79,7 @@ Map of content for the SO-100 + LeRobot vault. Agents: read [[CLAUDE]] first.
 - [[lerobot-06-extras]] — 0.6.x needs `--extra core_scripts`
 - [[act-has-no-language-input]] — ACT never sees the instruction; it cannot be the language fallback
 - [[identify-arms-by-homing-offset]] — which port is the leader, read-only, before any torque
+- [[iphone-continuity-camera-breaks-runs]] — the phone steals an index and hangs the run
 - [[conda-env-is-not-the-checkout]] — `git pull` does not touch the pip conda env; `uv sync` after every checkout
 - [[policy-inference-is-bursty]] — measure the chunk recompute, not the average (SmolVLA 152 ms on the 5060 Ti)
 - [[smolvla-camera-slots]] — camera1/2/3 and the `--rename_map`; the third slot is free
