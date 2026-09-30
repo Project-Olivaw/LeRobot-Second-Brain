@@ -15,12 +15,13 @@ if [ -z "$TASK" ]; then
   [ -n "$TASK" ] || { echo "no task found in $META — pass it as 4th argument" >&2; exit 1; }
 fi
 [ -e "$POLICY" ] && [ ! -f "$POLICY/config.json" ] && { echo "$POLICY has no config.json — point at .../checkpoints/<step>/pretrained_model" >&2; exit 1; }
-if [ -f "$POLICY/train_config.json" ]; then   # the policy knows its own map; ignore any RENAME_MAP left in the shell
-  RENAME_MAP=$(python3 -c "import json,sys; m=json.load(open(sys.argv[1])).get('rename_map') or {}; print(json.dumps(m) if m else '')" "$POLICY/train_config.json")
+PDIR=$(policy_dir "$POLICY")                 # a Hub id resolves to its cached snapshot directory
+if [ -n "$PDIR" ] && [ -f "$PDIR/train_config.json" ]; then   # the policy knows its own map; ignore any RENAME_MAP left in the shell
+  RENAME_MAP=$(python3 -c "import json,sys; m=json.load(open(sys.argv[1])).get('rename_map') or {}; print(json.dumps(m) if m else '')" "$PDIR/train_config.json")
 fi
 RM=""; [ -n "${RENAME_MAP:-}" ] && RM="--rename_map=$(q "$RENAME_MAP")"
 need_cameras
-POLICY_CAMERAS=$(cameras_for_policy "$POLICY") || exit 1   # only the cameras this policy was trained on
+POLICY_CAMERAS=$(cameras_for_policy "${PDIR:-$POLICY}") || exit 1   # only the cameras this policy was trained on
 INF=""; [ "${RTC:-0}" = 1 ] && INF="--inference.type=rtc"
 COMMON="$RUN lerobot-rollout \
   --robot.type=$ROBOT_TYPE --robot.port=$ROBOT_PORT --robot.id=$ROBOT_ID \

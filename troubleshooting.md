@@ -37,6 +37,8 @@
 | Follower goes limp / drops at teleop start | leader and follower ports swapped | `uv run python tools/identify_arms.py` — [[identify-arms-by-homing-offset]] |
 | Camera opens but every frame is black (macOS) | terminal lacks Camera permission, or index shifted | `tools/mac_cameras.sh`, `tools/check_cameras.py` — [[camera-indices-shift-on-replug]] |
 | `TimeoutError: Timed out waiting for frame from camera OpenCVCamera(N)` | that index is the iPhone Continuity Camera — opens, never streams | turn Continuity Camera off on the phone — [[iphone-continuity-camera-breaks-runs]] |
+| `Visual feature mismatch between policy and robot hardware` | `--rename_map` missing because the policy is a Hub id, not a directory | [[hub-id-is-not-a-directory]] |
+| `Failed to instantiate processor step 'device_processor' ... Requested device 'cuda'` | the checkpoint's processor carries the training device | pass `--device`/override it — `tools/bench_policy.py` does |
 | Multi-instruction policy ignores the sentence | trained ACT, or one object per dataset | [[act-has-no-language-input]], [[balance-the-instructions]] |
 | SmolVLA training dies in ~90 s with a camera-name error | `smolvla_base` expects `camera1/2/3` | pass `--rename_map` — [[smolvla-camera-slots]] |
 | Arm pauses rhythmically during a rollout | chunk recompute is slower than the control period | `--inference.type=rtc`; measure with `tools/bench_policy.py` — [[policy-inference-is-bursty]] |

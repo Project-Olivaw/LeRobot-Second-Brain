@@ -26,12 +26,13 @@ TASK=${1:-${DEMO_TASK1:-}}; POLICY=${2:-${DEMO_POLICY:-}}
 [ -n "$POLICY" ] || { echo "no policy: pass one, or set DEMO_POLICY in machines/$MACHINE.env" >&2; exit 1; }
 [ -n "$TASK" ]   || { echo "no instruction: pass one, or set DEMO_TASK1 in machines/$MACHINE.env" >&2; exit 1; }
 [ -e "$POLICY" ] && [ ! -f "$POLICY/config.json" ] && { echo "$POLICY has no config.json — point at .../pretrained_model" >&2; exit 1; }
+PDIR=$(policy_dir "$POLICY")      # a Hub id resolves to its cached snapshot; "" if not downloaded
 RM=""
-if [ -f "$POLICY/train_config.json" ]; then
-  MAP=$(python3 -c "import json,sys; m=json.load(open(sys.argv[1])).get('rename_map') or {}; print(json.dumps(m) if m else '')" "$POLICY/train_config.json")
+if [ -n "$PDIR" ] && [ -f "$PDIR/train_config.json" ]; then
+  MAP=$(python3 -c "import json,sys; m=json.load(open(sys.argv[1])).get('rename_map') or {}; print(json.dumps(m) if m else '')" "$PDIR/train_config.json")
   [ -n "$MAP" ] && RM="--rename_map=$(q "$MAP")"
 elif [ -n "${RENAME_MAP:-}" ]; then RM="--rename_map=$(q "$RENAME_MAP")"; fi
-POLICY_CAMERAS=$(cameras_for_policy "$POLICY") || exit 1
+POLICY_CAMERAS=$(cameras_for_policy "${PDIR:-$POLICY}") || exit 1
 INF="--inference.type=rtc"; [ "${RTC:-1}" = 0 ] && INF=""
 run "$RUN lerobot-rollout \
   --strategy.type=base --interactive=true $INF \

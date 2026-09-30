@@ -8,8 +8,11 @@ Status (2026-09-29): venv installed at `~/GitHub/AnotherOnes/lerobot` (0.6.2-dev
 `mps` available, `hf` CLI inside the venv), calibration copied. **Arms configured and verified** —
 ports in `machines/macbook.env`, confirmed read-only with `tools/identify_arms.py` (6/6 both).
 **Cameras configured**: all three USB cameras enumerate; the keys were swapped on the first try and
-are now `top=2, wrist=1, base=0`, confirmed by content. Still `TODO`: turn off Continuity Camera
-(see below), `uv run hf auth login`, Accessibility permission, first teleop, `mps` inference bench.
+are now `top=2, wrist=1, base=0`, confirmed by content. Teleop verified. Policy, dataset and the SmolVLM2 backbone are cached locally (offline load proven).
+**`mps` bench: 781 ms per chunk recompute**, 1.8 ms cached step, chunk = 1.67 s at 30 Hz — each recompute
+stalls ~23 control steps, so **RTC is required** (`--inference.type=rtc`, on by default in the demo
+scripts). Still `TODO`: turn off Continuity Camera (see below), light the scene up to the recorded
+brightness, Accessibility permission for the arrow keys.
 
 The policy and dataset for the talk are on the Hub (pull both **before** leaving wifi):
 

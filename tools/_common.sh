@@ -13,6 +13,29 @@ need_cameras() {
   exit 1
 }
 
+# policy_dir <policy_path_or_hub_id> -> a LOCAL directory for that policy, or "" if there is none.
+# A Hub id is not a directory, so `[ -f "$POLICY/train_config.json" ]` is false for it and every
+# caller silently lost the rename_map and the policy's camera list. lerobot-rollout then overrides
+# the map baked into the checkpoint with an empty one and dies with "Visual feature mismatch between
+# policy and robot hardware". This resolves an already-downloaded Hub id to its snapshot directory,
+# offline, so `DEMO_POLICY=user/policy` behaves exactly like a local path.
+# See lessons/hub-id-is-not-a-directory.md.
+# NOTE: this must run the venv's python ($RUN python), not the system python3 — huggingface_hub
+# lives in the lerobot venv, and a bare `python3` here silently returns "" and reintroduces the bug.
+policy_dir() {
+  [ -n "${1:-}" ] || return 0
+  if [ -d "$1" ]; then echo "$1"; return 0; fi
+  (cd "$LEROBOT_DIR" && $RUN python - "$1" <<'PY'
+import sys
+try:
+    from huggingface_hub import snapshot_download
+    print(snapshot_download(repo_id=sys.argv[1], local_files_only=True))
+except Exception:
+    print("")          # not cached: caller falls back to the profile's camera set
+PY
+  ) 2>/dev/null
+}
+
 # policy_camera_keys <policy_dir> -> the DATASET camera keys the policy was trained on, one per line.
 # A policy fine-tuned from smolvla_base stores them as the keys of its rename_map (top/wrist ->
 # camera1/camera2); ACT and friends store them directly in config.json input_features.
